@@ -54,13 +54,13 @@ public class TetrisPanel extends JPanel implements Runnable {
      * The y for the transform.
      * Used to draw falling boards - stores the y-coordinate.
      */
-    private int loseTransformY = 0;
+    private double loseTransformY = 0;
     
     /**
      * The velocity for the transform.
      * Used to draw falling boards - stores the velocity.
      */
-    private int loseTransformV = 0;
+    private double loseTransformV = 0;
     
     /**
      * Best of {@code FIRST_TO*2-1}. In this case, best of 3.
@@ -318,9 +318,9 @@ public class TetrisPanel extends JPanel implements Runnable {
     private void updateVariables() {
         if(loseTransformV != 0) {
             if(loseTransformV < 0) {
-                loseTransformV--;
+                loseTransformV -= 0.5;
             } else {
-                loseTransformV++;
+                loseTransformV += 0.5;
             }
             loseTransformY += loseTransformV;
             loseTransformY %= Integer.MAX_VALUE;
