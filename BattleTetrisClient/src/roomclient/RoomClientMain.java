@@ -13,20 +13,5 @@ public class RoomClientMain {
      */
     public static void main(String[] args) {
         ServerCommunication sc = new ServerCommunication();
-        Scanner input = new Scanner(System.in);
-        while(true) {
-            String line = input.nextLine();
-            switch(line) {
-                case "EXIT":
-                    sc.exitGame();
-                    break;
-                case "END":
-                    System.exit(0);
-                    break;
-                default:
-                    sc.out.println(line);
-                    break;
-            }
-        }
     }
 }
