@@ -13,6 +13,8 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
+import simpletetris.TetrisFrame;
+import simpletetris.TetrisKeyAdapter;
 
 /**
  * A client to server communication
@@ -96,6 +98,8 @@ public class ServerCommunication {
             socket.getInputStream()));
         out = new PrintWriter(socket.getOutputStream(), true);
         
+        TetrisFrame tFrame = null;
+        
         // Process all messages from server, according to the protocol.
         
         int temp = 0;
@@ -146,9 +150,21 @@ public class ServerCommunication {
                         System.err.println("The other person has left "
                                 + "the match.");
                         inGame = false;
-                    } else if(line.startsWith("NM")) {
-                        String message = line.substring(2);
-                        System.err.println("OPPONENT: " + message);
+                        tFrame = null;
+                    } else if(line.startsWith("NB")) {
+                        if(tFrame != null) 
+                            tFrame.opponent.addBag(line.substring(2));
+                    } else if(line.startsWith("LOCK")) {
+                        if(tFrame != null) {
+                            String[] data = line.substring(4).split(" ");
+                            tFrame.opponent.lockFalling(
+                                    Integer.parseInt(data[0]), 
+                                    Integer.parseInt(data[1]));
+                        }
+                    } else if(line.startsWith("M")) {
+                        if(tFrame != null)
+                            tFrame.opponent.executeAction(TetrisKeyAdapter.
+                                    GameAction.fromShorthand(line.substring(1)));
                     }
                 } else {
                     if(line.startsWith("SUBMITNAME")) {
@@ -170,10 +186,15 @@ public class ServerCommunication {
                         // whether I accept the challenge
                         boolean accepted = choice == JOptionPane.YES_OPTION;
                         inGame = accepted;
+                        if(inGame) {
+                            tFrame = new TetrisFrame();
+                        }
                         out.println("CHALLENGE_R" + challenger + " " + accepted);
                     } else if(line.startsWith("CHALLENGE_R")) {
                         inGame = Boolean.parseBoolean(line.substring(11));
-                        System.out.println(inGame);
+                        if(inGame) {
+                            tFrame = new TetrisFrame();
+                        }
                     }
                 }
             }

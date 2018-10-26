@@ -64,16 +64,6 @@ public class TetrisMatrix {
     private Tetromino hold;
     
     /**
-     * The ScoreKeeper for this TetrisMatrix.
-     */
-    //private final ScoreKeeper sk;
-    
-    /**
-     * The GarbageDealer for this TetrisMatrix.
-     */
-    //private final GarbageDealer gd;
-    
-    /**
      * The GarbageHandler for this TetrisMatrix.
      */
     private final GarbageHandler gh;
@@ -298,13 +288,13 @@ public class TetrisMatrix {
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
         });
-        if(!onLeft) {
+        /*if(!onLeft) {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
-        }
+        }*/
         
         falling = null;
     }
@@ -328,13 +318,13 @@ public class TetrisMatrix {
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
         });
-        if(!onLeft) {
+        /*if(!onLeft) {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
-        }
+        }*/
     }
     
     /**
