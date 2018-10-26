@@ -2,6 +2,8 @@ package roomclient;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -208,6 +210,9 @@ public class ServerCommunication {
                                     out.println("EXIT");
                                 }
                             });
+                            tFrame.setActionListener((ActionEvent e) -> {
+                                out.println(e.getActionCommand());
+                            });
                         }
                         out.println("CHALLENGE_R" + challenger + " " + accepted);
                     } else if(line.startsWith("CHALLENGE_R")) {
@@ -225,6 +230,9 @@ public class ServerCommunication {
                                     inGame = false;
                                     out.println("EXIT");
                                 }
+                            });
+                            tFrame.setActionListener((ActionEvent e) -> {
+                                out.println(e.getActionCommand());
                             });
                         }
                     }

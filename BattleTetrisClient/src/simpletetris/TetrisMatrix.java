@@ -730,6 +730,7 @@ public class TetrisMatrix {
      * @param ga the action to execute.
      */
     public void executeAction(GameAction ga) {
+        System.out.println(ga.name());
         if(falling == null) return;
         switch(ga) {
             case ROTATE_LEFT:
