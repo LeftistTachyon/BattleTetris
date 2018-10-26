@@ -150,7 +150,13 @@ public class ServerCommunication {
                         System.err.println("The other person has left "
                                 + "the match.");
                         inGame = false;
-                        tFrame = null;
+                        if(tFrame != null) {
+                            JOptionPane.showMessageDialog(tFrame, 
+                                    "The other person has left the match.", 
+                                    "Disconnected", JOptionPane.PLAIN_MESSAGE);
+                            tFrame.dispose();
+                            tFrame = null;
+                        }
                     } else if(line.startsWith("NB")) {
                         if(tFrame != null) 
                             tFrame.opponent.addBag(line.substring(2));
