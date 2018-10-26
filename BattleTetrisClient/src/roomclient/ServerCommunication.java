@@ -2,6 +2,8 @@ package roomclient;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -193,13 +195,37 @@ public class ServerCommunication {
                         boolean accepted = choice == JOptionPane.YES_OPTION;
                         inGame = accepted;
                         if(inGame) {
+                            Dimension ss = 
+                                    Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
+                            tFrame.setLocation(
+                                    (ss.width - tFrame.getWidth()) / 2, 
+                                    (ss.height - tFrame.getHeight()) / 2);
+                            tFrame.addWindowListener(new WindowAdapter() {
+                                @Override
+                                public void windowClosed(WindowEvent e) {
+                                    inGame = false;
+                                    out.println("EXIT");
+                                }
+                            });
                         }
                         out.println("CHALLENGE_R" + challenger + " " + accepted);
                     } else if(line.startsWith("CHALLENGE_R")) {
                         inGame = Boolean.parseBoolean(line.substring(11));
                         if(inGame) {
+                            Dimension ss = 
+                                    Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
+                            tFrame.setLocation(
+                                    (ss.width - tFrame.getWidth()) / 2, 
+                                    (ss.height - tFrame.getHeight()) / 2);
+                            tFrame.addWindowListener(new WindowAdapter() {
+                                @Override
+                                public void windowClosed(WindowEvent e) {
+                                    inGame = false;
+                                    out.println("EXIT");
+                                }
+                            });
                         }
                     }
                 }
