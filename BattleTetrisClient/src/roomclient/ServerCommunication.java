@@ -161,20 +161,23 @@ public class ServerCommunication {
                             tFrame.dispose();
                             tFrame = null;
                         }
-                    } else if(line.startsWith("NB")) {
-                        if(tFrame != null) 
-                            tFrame.opponent.addBag(line.substring(2));
-                    } else if(line.startsWith("LOCK")) {
-                        if(tFrame != null) {
-                            String[] data = line.substring(4).split(" ");
-                            tFrame.opponent.lockFalling(
-                                    Integer.parseInt(data[0]), 
-                                    Integer.parseInt(data[1]));
+                    } else {
+                        System.err.println(line);
+                        if(line.startsWith("NB")) {
+                            if(tFrame != null) 
+                                tFrame.opponent.addBag(line.substring(2));
+                        } else if(line.startsWith("LOCK")) {
+                            if(tFrame != null) {
+                                String[] data = line.substring(4).split(" ");
+                                tFrame.opponent.lockFalling(
+                                        Integer.parseInt(data[0]), 
+                                        Integer.parseInt(data[1]));
+                            }
+                        } else if(line.startsWith("M")) {
+                            if(tFrame != null)
+                                tFrame.opponent.executeAction(TetrisKeyAdapter.
+                                        GameAction.fromShorthand(line.substring(1)));
                         }
-                    } else if(line.startsWith("M")) {
-                        if(tFrame != null)
-                            tFrame.opponent.executeAction(TetrisKeyAdapter.
-                                    GameAction.fromShorthand(line.substring(1)));
                     }
                 } else {
                     if(line.startsWith("SUBMITNAME")) {
@@ -200,6 +203,7 @@ public class ServerCommunication {
                             Dimension ss = 
                                     Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
+                            tFrame.notifyFirstBag();
                             tFrame.setLocation(
                                     (ss.width - tFrame.getWidth()) / 2, 
                                     (ss.height - tFrame.getHeight()) / 2);
@@ -212,6 +216,7 @@ public class ServerCommunication {
                             });
                             tFrame.setActionListener((ActionEvent e) -> {
                                 out.println(e.getActionCommand());
+                                System.out.println(e.getActionCommand());
                             });
                         }
                         out.println("CHALLENGE_R" + challenger + " " + accepted);
@@ -221,6 +226,7 @@ public class ServerCommunication {
                             Dimension ss = 
                                     Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
+                            tFrame.notifyFirstBag();
                             tFrame.setLocation(
                                     (ss.width - tFrame.getWidth()) / 2, 
                                     (ss.height - tFrame.getHeight()) / 2);
@@ -233,6 +239,7 @@ public class ServerCommunication {
                             });
                             tFrame.setActionListener((ActionEvent e) -> {
                                 out.println(e.getActionCommand());
+                                System.out.println(e.getActionCommand());
                             });
                         }
                     }
