@@ -24,16 +24,16 @@ This protocol table is for communication between the client and the server.
 ## In-Game Command table  
 This protocol table is for communication between clients in-game (for Tetris).  
 
-|Command Name/Header|Command Body                           |Response                                                   |
-|:-----------------:|:-------------------------------------:|:---------------------------------------------------------:|
-|`NB` (new bag)     |`[String bagOrder]`                    |None, but adds a new bag to the matrix.                    |
-|`LOCK`             |`[int x] [int y]`                      |None, but locks the piece in place in the given coordinates|
-|`M` (move)         |`[String move]` L, R, RR, RL, H, SD, HD|None, but executes the action.                             |
+|Command Name/Header|Command Body                           |Response                                                          |
+|:-----------------:|:-------------------------------------:|:----------------------------------------------------------------:|
+|`NB` (new bag)     |`[String bagOrder]`                    |None, but adds a new bag to the matrix.                           |
+|`LOCK`             |`[int x] [int y]`                      |None, but locks the piece in place in the given coordinates       |
+|`M` (move)         |`[String move]` L, R, RR, RL, H, SD, HD|None, but executes the action.                                    |
+|`SB`               |none                                   |Gives the order of both bags, first this person, then the opponent|
   
 This protocol table is for communication between clients for chatting.  
   
 |Command Name/Header|Command Body                    |Response                                                 |
 |:-----------------:|:------------------------------:|:-------------------------------------------------------:|
-|`NM` (in-game)     |`[String message]`              |None, but adds message to chat history                   |
 |`NLM` (lobby chat) |`[String name] [String message]`|None, but adds message to chat history                   |
 |`EXIT`             |(none)                          |None, but adds to chat history that the other person left|
