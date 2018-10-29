@@ -34,6 +34,7 @@ public class TetrisBag {
     public TetrisBag(boolean suspended) {
         this.suspended = suspended;
         queue = new LinkedList<>();
+        regenerateBag();
     }
     
     /**
@@ -125,6 +126,14 @@ public class TetrisBag {
     }
     
     /**
+     * Returns whether the queue is empty
+     * @return whether the queue is empty
+     */
+    public boolean isEmpty() {
+        return queue.isEmpty();
+    }
+    
+    /**
      * The listener which islistening in
      */
     private ActionListener listener = null;
@@ -151,5 +160,51 @@ public class TetrisBag {
     private void notifyListener(String message) {
         if(listener != null)
             listener.actionPerformed(new ActionEvent(this, 0, message));
+    }
+    
+    /**
+     * A Bag that can be randomly accessed.
+     */
+    private static String RAM_BAG;
+    
+    /**
+     * Regenerates the RAM_BAG;
+     */
+    public static void regenerateRAMBag() {
+        ArrayList<String> r = new ArrayList<>();
+        r.add("I");
+        r.add("J");
+        r.add("L");
+        r.add("O");
+        r.add("S");
+        r.add("T");
+        r.add("Z");
+        
+        RAM_BAG = "";
+        
+        while(!r.isEmpty()) {
+            int i = (int) (Math.random() * r.size());
+            String t = r.remove(i);
+            RAM_BAG += t;
+        }
+    }
+
+    /**
+     * Returns the RAM_BAG
+     * @return the RAM_BAG
+     */
+    public static String getRAM_BAG() {
+        return RAM_BAG;
+    }
+    
+    /**
+     * Generates a TetrisBag from the RAM_BAG
+     * @param onLeft whether the bag should be left- or right-handed
+     * @return the TetrisBag created/generated
+     */
+    public static TetrisBag fromRAM(boolean onLeft) {
+        TetrisBag output = new TetrisBag(onLeft);
+        output.addBag(RAM_BAG);
+        return output;
     }
 }

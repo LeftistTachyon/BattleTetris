@@ -3,7 +3,6 @@ package roomclient;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
@@ -17,6 +16,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
+import simpletetris.TetrisBag;
 import simpletetris.TetrisFrame;
 import simpletetris.TetrisKeyAdapter;
 
@@ -164,8 +164,29 @@ public class ServerCommunication {
                     } else {
                         System.err.println(line);
                         if(line.startsWith("NB")) {
-                            if(tFrame != null) 
+                            if(tFrame != null) {
                                 tFrame.opponent.addBag(line.substring(2));
+                            } else {
+                                Dimension ss = 
+                                    Toolkit.getDefaultToolkit().getScreenSize();
+                                tFrame = new TetrisFrame();
+                                tFrame.notifyFirstBag();
+                                tFrame.setLocation(
+                                        (ss.width - tFrame.getWidth()) / 2, 
+                                        (ss.height - tFrame.getHeight()) / 2);
+                                tFrame.addWindowListener(new WindowAdapter() {
+                                    @Override
+                                    public void windowClosed(WindowEvent e) {
+                                        inGame = false;
+                                        out.println("EXIT");
+                                    }
+                                });
+                                tFrame.setActionListener((ActionEvent e) -> {
+                                    out.println(e.getActionCommand());
+                                    System.out.println(e.getActionCommand());
+                                });
+                                tFrame.opponent.addBag(line.substring(2));
+                            }
                         } else if(line.startsWith("LOCK")) {
                             if(tFrame != null) {
                                 String[] data = line.substring(4).split(" ");
@@ -200,7 +221,9 @@ public class ServerCommunication {
                         boolean accepted = choice == JOptionPane.YES_OPTION;
                         inGame = accepted;
                         if(inGame) {
-                            Dimension ss = 
+                            TetrisBag.regenerateRAMBag();
+                            out.println("NB" + TetrisBag.getRAM_BAG());
+                            /*Dimension ss = 
                                     Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
                             tFrame.notifyFirstBag();
@@ -217,13 +240,15 @@ public class ServerCommunication {
                             tFrame.setActionListener((ActionEvent e) -> {
                                 out.println(e.getActionCommand());
                                 System.out.println(e.getActionCommand());
-                            });
+                            });*/
                         }
                         out.println("CHALLENGE_R" + challenger + " " + accepted);
                     } else if(line.startsWith("CHALLENGE_R")) {
                         inGame = Boolean.parseBoolean(line.substring(11));
                         if(inGame) {
-                            Dimension ss = 
+                            TetrisBag.regenerateRAMBag();
+                            out.println("NB" + TetrisBag.getRAM_BAG());
+                            /*Dimension ss = 
                                     Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
                             tFrame.notifyFirstBag();
@@ -240,7 +265,7 @@ public class ServerCommunication {
                             tFrame.setActionListener((ActionEvent e) -> {
                                 out.println(e.getActionCommand());
                                 System.out.println(e.getActionCommand());
-                            });
+                            });*/
                         }
                     }
                 }

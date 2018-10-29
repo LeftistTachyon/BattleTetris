@@ -239,7 +239,6 @@ public class TetrisKeyAdapter extends KeyAdapter {
      * @param ga the action to execute
      */
     private void executeAction(GameAction ga) {
-        System.out.println(listening);
         if(listening) {
             notifyListener("M" + ga.shorthand);
             matrix.executeAction(ga);

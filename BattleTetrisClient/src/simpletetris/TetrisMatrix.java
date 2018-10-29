@@ -289,7 +289,8 @@ public class TetrisMatrix {
         kicked = false;
         hold = null;
         matrix = new Color[WIDTH][HEIGHT];
-        bag = new TetrisBag(!onLeft);
+        if(onLeft) bag = TetrisBag.fromRAM(false);
+        else bag = new TetrisBag(true);
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
         });
@@ -745,7 +746,6 @@ public class TetrisMatrix {
      * @param ga the action to execute.
      */
     public void executeAction(GameAction ga) {
-        System.out.println(ga.name());
         if(falling == null) return;
         switch(ga) {
             case ROTATE_LEFT:
@@ -834,6 +834,14 @@ public class TetrisMatrix {
         gravity.resetGravity();
         
         holdSwappable = true;
+    }
+    
+    /**
+     * Returns whether the bag is empty
+     * @return whether the bag is empty
+     */
+    public boolean isBagEmpty() {
+        return bag.isEmpty();
     }
     
     /**

@@ -72,8 +72,7 @@ public class TetrisFrame extends JFrame {
             } else notifyListener(message);
         });
         
-        super.setVisible(true);
-        new Thread(panel).start();
+        display();
     }
     
     /**
@@ -110,5 +109,13 @@ public class TetrisFrame extends JFrame {
     private void notifyListener(String message) {
         if(listener != null)
             listener.actionPerformed(new ActionEvent(this, 0, message));
+    }
+    
+    /**
+     * Displays this TetrisFrame.
+     */
+    public void display() {
+        super.setVisible(true);
+        new Thread(panel).start();
     }
 }
