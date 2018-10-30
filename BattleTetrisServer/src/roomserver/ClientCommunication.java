@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
@@ -65,6 +67,11 @@ public class ClientCommunication {
          * Whether this client is in a game
          */
         private boolean inGame;
+        
+        /**
+         * The beginning bags
+         */
+        private String loadedBagThis = null, loadedBagOpp = null;
         
         /**
          * Constructs a handler thread, squirreling away the socket.
@@ -144,7 +151,7 @@ public class ClientCommunication {
                             h.out.println(message);
                         }
                     } else if(inGame) {
-                        if(line.startsWith("EXIT")) {
+                        if(line.equals("EXIT")) {
                             inGame = false;
                             busy.remove(this);
                             for(Handler h : handlers.values()) {
@@ -159,6 +166,18 @@ public class ClientCommunication {
                                 }
                                 
                                 opponent = null;
+                            }
+                        } else if(line.startsWith("SB")) {
+                            if(loadedBagOpp == null || loadedBagThis == null) {
+                                String thisBag = newBag(), thatBag = newBag();
+                                out.println("SB" + thisBag + " " + thatBag);
+                                opponent.loadedBagOpp = thisBag;
+                                opponent.loadedBagThis = thatBag;
+                            } else {
+                                out.println("SB" + loadedBagThis + 
+                                        " " + loadedBagOpp);
+                                loadedBagThis = null;
+                                loadedBagOpp = null;
                             }
                         } else opponent.out.println(line);
                     } else {
@@ -227,6 +246,21 @@ public class ClientCommunication {
                     socket.close();
                 } catch(IOException e) {}
             }
+        }
+        
+        /**
+         * Generates a new bag of tetrominos
+         * @return the order of the bag
+         */
+        private static String newBag() {
+            ArrayList<String> all = new ArrayList<>(Arrays.asList(
+                    new String[]{"T", "S", "L", "Z", "J", "I", "O"}));
+            String output = "";
+            while(!all.isEmpty()) {
+                int r = (int) (Math.random() * all.size());
+                output += all.remove(r);
+            }
+            return output;
         }
  
         @Override

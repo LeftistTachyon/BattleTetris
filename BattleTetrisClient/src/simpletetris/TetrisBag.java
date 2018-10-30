@@ -162,49 +162,54 @@ public class TetrisBag {
             listener.actionPerformed(new ActionEvent(this, 0, message));
     }
     
-    /**
-     * A Bag that can be randomly accessed.
-     */
-    private static String RAM_BAG;
+//    /**
+//     * A Bag that can be randomly accessed.
+//     */
+//    private static String RAM_BAG;
+//    
+//    /**
+//     * Regenerates the RAM_BAG;
+//     */
+//    public static void regenerateRAMBag() {
+//        ArrayList<String> r = new ArrayList<>();
+//        r.add("I");
+//        r.add("J");
+//        r.add("L");
+//        r.add("O");
+//        r.add("S");
+//        r.add("T");
+//        r.add("Z");
+//        
+//        RAM_BAG = "";
+//        
+//        while(!r.isEmpty()) {
+//            int i = (int) (Math.random() * r.size());
+//            String t = r.remove(i);
+//            RAM_BAG += t;
+//        }
+//    }
+//
+//    /**
+//     * Returns the RAM_BAG
+//     * @return the RAM_BAG
+//     */
+//    public static String getRAM_BAG() {
+//        return RAM_BAG;
+//    }
+//    
+//    /**
+//     * Generates a TetrisBag from the RAM_BAG
+//     * @param onLeft whether the bag should be left- or right-handed
+//     * @return the TetrisBag created/generated
+//     */
+//    public static TetrisBag fromRAM(boolean onLeft) {
+//        TetrisBag output = new TetrisBag(onLeft);
+//        output.addBag(RAM_BAG);
+//        return output;
+//    }
     
     /**
-     * Regenerates the RAM_BAG;
+     * Some RAM bags
      */
-    public static void regenerateRAMBag() {
-        ArrayList<String> r = new ArrayList<>();
-        r.add("I");
-        r.add("J");
-        r.add("L");
-        r.add("O");
-        r.add("S");
-        r.add("T");
-        r.add("Z");
-        
-        RAM_BAG = "";
-        
-        while(!r.isEmpty()) {
-            int i = (int) (Math.random() * r.size());
-            String t = r.remove(i);
-            RAM_BAG += t;
-        }
-    }
-
-    /**
-     * Returns the RAM_BAG
-     * @return the RAM_BAG
-     */
-    public static String getRAM_BAG() {
-        return RAM_BAG;
-    }
-    
-    /**
-     * Generates a TetrisBag from the RAM_BAG
-     * @param onLeft whether the bag should be left- or right-handed
-     * @return the TetrisBag created/generated
-     */
-    public static TetrisBag fromRAM(boolean onLeft) {
-        TetrisBag output = new TetrisBag(onLeft);
-        output.addBag(RAM_BAG);
-        return output;
-    }
+    public static String RAM_BAG_THIS = null, RAM_BAG_THAT = null;
 }

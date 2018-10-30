@@ -164,29 +164,8 @@ public class ServerCommunication {
                     } else {
                         System.err.println(line);
                         if(line.startsWith("NB")) {
-                            if(tFrame != null) {
+                            if(tFrame != null)
                                 tFrame.opponent.addBag(line.substring(2));
-                            } else {
-                                Dimension ss = 
-                                    Toolkit.getDefaultToolkit().getScreenSize();
-                                tFrame = new TetrisFrame();
-                                tFrame.notifyFirstBag();
-                                tFrame.setLocation(
-                                        (ss.width - tFrame.getWidth()) / 2, 
-                                        (ss.height - tFrame.getHeight()) / 2);
-                                tFrame.addWindowListener(new WindowAdapter() {
-                                    @Override
-                                    public void windowClosed(WindowEvent e) {
-                                        inGame = false;
-                                        out.println("EXIT");
-                                    }
-                                });
-                                tFrame.setActionListener((ActionEvent e) -> {
-                                    out.println(e.getActionCommand());
-                                    System.out.println(e.getActionCommand());
-                                });
-                                tFrame.opponent.addBag(line.substring(2));
-                            }
                         } else if(line.startsWith("LOCK")) {
                             if(tFrame != null) {
                                 String[] data = line.substring(4).split(" ");
@@ -198,6 +177,30 @@ public class ServerCommunication {
                             if(tFrame != null)
                                 tFrame.opponent.executeAction(TetrisKeyAdapter.
                                         GameAction.fromShorthand(line.substring(1)));
+                        } else if(line.startsWith("SB")) {
+                            String[] bags = line.substring(2).split(" ");
+                            TetrisBag.RAM_BAG_THIS = bags[0];
+                            TetrisBag.RAM_BAG_THAT = bags[1];
+                            if(tFrame == null) {
+                                Dimension ss = 
+                                        Toolkit.getDefaultToolkit().getScreenSize();
+                                tFrame = new TetrisFrame();
+                                tFrame.setLocation(
+                                        (ss.width - tFrame.getWidth()) / 2, 
+                                        (ss.height - tFrame.getHeight()) / 2);
+                                tFrame.addWindowListener(new WindowAdapter() {
+                                    @Override
+                                    public void windowClosed(WindowEvent e) {
+                                        inGame = false;
+                                        System.out.println("The darn thing closed");
+                                        out.println("EXIT");
+                                    }
+                                });
+                                tFrame.setActionListener((ActionEvent e) -> {
+                                    out.println(e.getActionCommand());
+                                    System.out.println(e.getActionCommand());
+                                });
+                            }
                         }
                     }
                 } else {
@@ -221,12 +224,10 @@ public class ServerCommunication {
                         boolean accepted = choice == JOptionPane.YES_OPTION;
                         inGame = accepted;
                         if(inGame) {
-                            TetrisBag.regenerateRAMBag();
-                            out.println("NB" + TetrisBag.getRAM_BAG());
+                            out.println("SB");
                             /*Dimension ss = 
                                     Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
-                            tFrame.notifyFirstBag();
                             tFrame.setLocation(
                                     (ss.width - tFrame.getWidth()) / 2, 
                                     (ss.height - tFrame.getHeight()) / 2);
@@ -246,12 +247,10 @@ public class ServerCommunication {
                     } else if(line.startsWith("CHALLENGE_R")) {
                         inGame = Boolean.parseBoolean(line.substring(11));
                         if(inGame) {
-                            TetrisBag.regenerateRAMBag();
-                            out.println("NB" + TetrisBag.getRAM_BAG());
+                            out.println("SB");
                             /*Dimension ss = 
                                     Toolkit.getDefaultToolkit().getScreenSize();
                             tFrame = new TetrisFrame();
-                            tFrame.notifyFirstBag();
                             tFrame.setLocation(
                                     (ss.width - tFrame.getWidth()) / 2, 
                                     (ss.height - tFrame.getHeight()) / 2);

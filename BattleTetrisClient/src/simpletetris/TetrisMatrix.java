@@ -254,11 +254,6 @@ public class TetrisMatrix {
     private boolean showAllClear = false;
     
     /**
-     * The first bag
-     */
-    private String firstBag;
-    
-    /**
      * Creates a new, default TetrisMatrix.
      */
     public TetrisMatrix() {
@@ -289,12 +284,17 @@ public class TetrisMatrix {
         kicked = false;
         hold = null;
         matrix = new Color[WIDTH][HEIGHT];
-        if(onLeft) bag = TetrisBag.fromRAM(false);
-        else bag = new TetrisBag(true);
+        bag = new TetrisBag(!onLeft);
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
         });
-        firstBag = bag.regenerateBag();
+        if(onLeft) {
+            bag.addBag(TetrisBag.RAM_BAG_THIS);
+            TetrisBag.RAM_BAG_THIS = null;
+        } else {
+            bag.addBag(TetrisBag.RAM_BAG_THAT);
+            TetrisBag.RAM_BAG_THAT = null;
+        }
         /*if(!onLeft) {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
@@ -325,7 +325,13 @@ public class TetrisMatrix {
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
         });
-        firstBag = bag.regenerateBag();
+        if(onLeft) {
+            bag.addBag(TetrisBag.RAM_BAG_THIS);
+            TetrisBag.RAM_BAG_THIS = null;
+        } else {
+            bag.addBag(TetrisBag.RAM_BAG_THAT);
+            TetrisBag.RAM_BAG_THAT = null;
+        }
         /*if(!onLeft) {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
@@ -333,14 +339,6 @@ public class TetrisMatrix {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
         }*/
-    }
-
-    /**
-     * Returns the order of the first bag
-     * @return the order of the first bag
-     */
-    public String getFirstBag() {
-        return firstBag;
     }
     
     /**
@@ -794,7 +792,9 @@ public class TetrisMatrix {
                 AudioPlayer.playMoveSFX(0.1);
                 break;
             case HARD_DROP:
-                y = getGhostY();
+                int gY = getGhostY();
+                if(y != gY) lastAction = ga;
+                y = gY;
                 if(onLeft) lockPiece();
                 AudioPlayer.playMoveSFX(1.0);
                 break;

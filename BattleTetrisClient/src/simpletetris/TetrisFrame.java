@@ -76,13 +76,6 @@ public class TetrisFrame extends JFrame {
     }
     
     /**
-     * Notifies the first bag. Just a patch of a bug.
-     */
-    public void notifyFirstBag() {
-        notifyListener("NB" + panel.playerMatrix.getFirstBag());
-    }
-    
-    /**
      * The listener which is listening in
      */
     private ActionListener listener = null;
