@@ -74,6 +74,11 @@ public class ClientCommunication {
         private String loadedBagThis = null, loadedBagOpp = null;
         
         /**
+         * The lock object used for synchronizing bag creation.
+         */
+        private static final Object BAG_LOCK = new Object();
+        
+        /**
          * Constructs a handler thread, squirreling away the socket.
          * All the interesting work is done in the run method.
          * @param socket the socket that receives info from the client
@@ -168,23 +173,24 @@ public class ClientCommunication {
                                 opponent = null;
                             }
                         } else if(line.equals("SB")) {
-                            System.out.println("-" + name + "-");
-                            if(loadedBagOpp == null || loadedBagThis == null) {
-                                String thisBag = newBag(), thatBag = newBag();
-                                String toSend = "SB" + thisBag + " " + thatBag;
-                                out.println(toSend);
-                                System.out.print("SERVER to ");
-                                println(toSend);
-                                opponent.loadedBagOpp = thisBag;
-                                opponent.loadedBagThis = thatBag;
-                            } else {
-                                String toSend = "SB" + loadedBagThis + 
-                                        " " + loadedBagOpp;
-                                out.println(toSend);
-                                System.out.print("SERVER to ");
-                                println(toSend);
-                                loadedBagThis = null;
-                                loadedBagOpp = null;
+                            synchronized(BAG_LOCK) {
+                                if(loadedBagOpp == null || loadedBagThis == null) {
+                                    String thisBag = newBag(), thatBag = newBag();
+                                    String toSend = "SB" + thisBag + " " + thatBag;
+                                    out.println(toSend);
+                                    System.out.print("SERVER to ");
+                                    println(toSend);
+                                    opponent.loadedBagOpp = thisBag;
+                                    opponent.loadedBagThis = thatBag;
+                                } else {
+                                    String toSend = "SB" + loadedBagThis + 
+                                            " " + loadedBagOpp;
+                                    out.println(toSend);
+                                    System.out.print("SERVER to ");
+                                    println(toSend);
+                                    loadedBagThis = null;
+                                    loadedBagOpp = null;
+                                }
                             }
                         } else opponent.out.println(line);
                     } else {

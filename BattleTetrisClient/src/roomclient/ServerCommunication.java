@@ -192,7 +192,6 @@ public class ServerCommunication {
                                     @Override
                                     public void windowClosed(WindowEvent e) {
                                         inGame = false;
-                                        System.out.println("The darn thing closed");
                                         AudioPlayer.stopBackgroundMusic();
                                         out.println("EXIT");
                                     }
@@ -227,45 +226,11 @@ public class ServerCommunication {
                         out.println("CHALLENGE_R" + challenger + " " + accepted);
                         if(accepted) {
                             out.println("SB");
-                            /*Dimension ss = 
-                                    Toolkit.getDefaultToolkit().getScreenSize();
-                            tFrame = new TetrisFrame();
-                            tFrame.setLocation(
-                                    (ss.width - tFrame.getWidth()) / 2, 
-                                    (ss.height - tFrame.getHeight()) / 2);
-                            tFrame.addWindowListener(new WindowAdapter() {
-                                @Override
-                                public void windowClosed(WindowEvent e) {
-                                    inGame = false;
-                                    out.println("EXIT");
-                                }
-                            });
-                            tFrame.setActionListener((ActionEvent e) -> {
-                                out.println(e.getActionCommand());
-                                System.out.println(e.getActionCommand());
-                            });*/
                         }
                     } else if(line.startsWith("CHALLENGE_R")) {
                         inGame = Boolean.parseBoolean(line.substring(11));
                         if(inGame) {
                             out.println("SB");
-                            /*Dimension ss = 
-                                    Toolkit.getDefaultToolkit().getScreenSize();
-                            tFrame = new TetrisFrame();
-                            tFrame.setLocation(
-                                    (ss.width - tFrame.getWidth()) / 2, 
-                                    (ss.height - tFrame.getHeight()) / 2);
-                            tFrame.addWindowListener(new WindowAdapter() {
-                                @Override
-                                public void windowClosed(WindowEvent e) {
-                                    inGame = false;
-                                    out.println("EXIT");
-                                }
-                            });
-                            tFrame.setActionListener((ActionEvent e) -> {
-                                out.println(e.getActionCommand());
-                                System.out.println(e.getActionCommand());
-                            });*/
                         }
                     }
                 }

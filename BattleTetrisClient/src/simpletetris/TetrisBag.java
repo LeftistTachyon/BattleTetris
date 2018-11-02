@@ -34,7 +34,6 @@ public class TetrisBag {
     public TetrisBag(boolean suspended) {
         this.suspended = suspended;
         queue = new LinkedList<>();
-        regenerateBag();
     }
     
     /**
