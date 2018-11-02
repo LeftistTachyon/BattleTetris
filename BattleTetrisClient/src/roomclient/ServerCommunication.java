@@ -16,6 +16,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
+import simpletetris.AudioPlayer;
 import simpletetris.TetrisBag;
 import simpletetris.TetrisFrame;
 import simpletetris.TetrisKeyAdapter;
@@ -162,7 +163,6 @@ public class ServerCommunication {
                             tFrame = null;
                         }
                     } else {
-                        System.err.println(line);
                         if(line.startsWith("NB")) {
                             if(tFrame != null)
                                 tFrame.opponent.addBag(line.substring(2));
@@ -193,12 +193,12 @@ public class ServerCommunication {
                                     public void windowClosed(WindowEvent e) {
                                         inGame = false;
                                         System.out.println("The darn thing closed");
+                                        AudioPlayer.stopBackgroundMusic();
                                         out.println("EXIT");
                                     }
                                 });
                                 tFrame.setActionListener((ActionEvent e) -> {
                                     out.println(e.getActionCommand());
-                                    System.out.println(e.getActionCommand());
                                 });
                             }
                         }
@@ -223,7 +223,9 @@ public class ServerCommunication {
                         // whether I accept the challenge
                         boolean accepted = choice == JOptionPane.YES_OPTION;
                         inGame = accepted;
-                        if(inGame) {
+                        
+                        out.println("CHALLENGE_R" + challenger + " " + accepted);
+                        if(accepted) {
                             out.println("SB");
                             /*Dimension ss = 
                                     Toolkit.getDefaultToolkit().getScreenSize();
@@ -243,7 +245,6 @@ public class ServerCommunication {
                                 System.out.println(e.getActionCommand());
                             });*/
                         }
-                        out.println("CHALLENGE_R" + challenger + " " + accepted);
                     } else if(line.startsWith("CHALLENGE_R")) {
                         inGame = Boolean.parseBoolean(line.substring(11));
                         if(inGame) {

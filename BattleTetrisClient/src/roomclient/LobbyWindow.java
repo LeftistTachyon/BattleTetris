@@ -158,6 +158,7 @@ public class LobbyWindow extends JFrame {
      */
     public void addLobbyMessage(String message) {
         chatTP.setText(chatTP.getText() + message + "\n");
+        chatTP.selectAll();
     }
     
     /**

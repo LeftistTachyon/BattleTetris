@@ -167,15 +167,22 @@ public class ClientCommunication {
                                 
                                 opponent = null;
                             }
-                        } else if(line.startsWith("SB")) {
+                        } else if(line.equals("SB")) {
+                            System.out.println("-" + name + "-");
                             if(loadedBagOpp == null || loadedBagThis == null) {
                                 String thisBag = newBag(), thatBag = newBag();
-                                out.println("SB" + thisBag + " " + thatBag);
+                                String toSend = "SB" + thisBag + " " + thatBag;
+                                out.println(toSend);
+                                System.out.print("SERVER to ");
+                                println(toSend);
                                 opponent.loadedBagOpp = thisBag;
                                 opponent.loadedBagThis = thatBag;
                             } else {
-                                out.println("SB" + loadedBagThis + 
-                                        " " + loadedBagOpp);
+                                String toSend = "SB" + loadedBagThis + 
+                                        " " + loadedBagOpp;
+                                out.println(toSend);
+                                System.out.print("SERVER to ");
+                                println(toSend);
                                 loadedBagThis = null;
                                 loadedBagOpp = null;
                             }
