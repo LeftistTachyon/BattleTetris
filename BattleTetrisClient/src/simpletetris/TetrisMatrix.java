@@ -325,13 +325,7 @@ public class TetrisMatrix {
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
         });
-        if(onLeft) {
-            bag.addBag(TetrisBag.RAM_BAG_THIS);
-            TetrisBag.RAM_BAG_THIS = null;
-        } else {
-            bag.addBag(TetrisBag.RAM_BAG_THAT);
-            TetrisBag.RAM_BAG_THAT = null;
-        }
+        bag.regenerateBag();
         /*if(!onLeft) {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");

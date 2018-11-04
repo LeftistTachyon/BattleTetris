@@ -53,6 +53,16 @@ public class ServerCommunication {
     private HashMap<String, Boolean> status;
     
     /**
+     * My opponent's name.
+     */
+    private static String opponentName = null;
+    
+    /**
+     * My name.
+     */
+    private static String myName = null;
+    
+    /**
      * Standard constructor.
      */
     public ServerCommunication() {
@@ -208,6 +218,7 @@ public class ServerCommunication {
                         _name = getName(temp++ == 0);
                         out.println(_name);
                         System.out.println(_name);
+                        myName = _name;
                     } else if(line.startsWith("NAMEACCEPTED")) {
                         // the server has accepted your name
                         temp = 0;
@@ -225,11 +236,14 @@ public class ServerCommunication {
                         
                         out.println("CHALLENGE_R" + challenger + " " + accepted);
                         if(accepted) {
+                            opponentName = challenger;
                             out.println("SB");
                         }
                     } else if(line.startsWith("CHALLENGE_R")) {
-                        inGame = Boolean.parseBoolean(line.substring(11));
+                        String[] data = line.substring(11).split(" ");
+                        inGame = Boolean.parseBoolean(data[0]);
                         if(inGame) {
+                            opponentName = data[1];
                             out.println("SB");
                         }
                     }
@@ -299,5 +313,22 @@ public class ServerCommunication {
     public void exitGame() {
         out.println("EXIT");
         inGame = false;
+    }
+    
+    /**
+     * Returns this client's name.
+     * @return this client's name
+     */
+    public static String getMyName() {
+        return myName;
+    }
+
+    /**
+     * Returns this client's opponent's name.
+     * Returns {@code null} if there is no opponent
+     * @return this client's opponent's name
+     */
+    public static String getOpponentName() {
+        return opponentName;
     }
 }

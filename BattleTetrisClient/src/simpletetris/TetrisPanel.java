@@ -1,10 +1,12 @@
 package simpletetris;
 
 import java.awt.Color;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,6 +16,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
+import roomclient.ServerCommunication;
+import static simpletetris.TetrisMatrix.*;
 
 /**
  * The JPanel where all of the images are drawn
@@ -220,6 +224,16 @@ public class TetrisPanel extends JPanel implements Runnable {
     public void update(Graphics g) {
         paint(g);
     }
+    
+    /**
+     * The height of the TetrisMatrixes.
+     */
+    private final double MATRIX_HEIGHT = VISIBLE_HEIGHT * Mino.MINO_WIDTH;
+    
+    /**
+     * The width of the TetrisMatrixes.
+     */
+    private final double MATRIX_WIDTH = TetrisMatrix.WIDTH * Mino.MINO_WIDTH;
 
     @Override
     public void paint(Graphics g) {
@@ -234,14 +248,38 @@ public class TetrisPanel extends JPanel implements Runnable {
                 playerMatrix.draw(g2D);
                 g2D.translate(0, -loseTransformY);
             } else g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
-                    TetrisMatrix.BAR_WIDTH_GAP, 0);
+                    BAR_WIDTH_GAP, 0);
         } else {
             playerMatrix.draw(g2D);
         }
         
+        AffineTransform at1 = g2D.getTransform(), it1 = null;
+        try {
+            it1 = at1.createInverse();
+            it1.translate(130, 20);
+        } catch (NoninvertibleTransformException ex) {
+            System.err.println("Player 1\'s transform can\'t be inverted");
+        }
+        g2D.transform(it1);
+        
+        /* Shoutouts to Daniel Kvist for this code. */
+        // Get the FontMetrics
+        FontMetrics metrics1 = g2D.getFontMetrics(g2D.getFont());
+        // Determine the X coordinate for the text
+        int x1 = (int) ((MATRIX_WIDTH - metrics1.stringWidth(ServerCommunication.getMyName())) / 2);
+        // Draw the String
+        g2D.drawString(ServerCommunication.getMyName(), x1, 
+                (int) (MATRIX_HEIGHT + metrics1.getHeight()));
+        
+        try {
+            g2D.transform(it1.createInverse());
+        } catch (NoninvertibleTransformException ex) {
+            System.err.println("Player 1\'s inverse can\'t be inverted");
+        }
+        
         g2D.translate(7.5, 0);
         
-        int bottom = (int) (Mino.MINO_WIDTH*TetrisMatrix.VISIBLE_HEIGHT - 50);
+        int bottom = (int) (Mino.MINO_WIDTH*VISIBLE_HEIGHT - 50);
         g2D.setColor(Color.WHITE);
         g2D.fillRect(-100, bottom - 50, 200, 50);
         
@@ -259,20 +297,47 @@ public class TetrisPanel extends JPanel implements Runnable {
         g2D.drawImage(WIN_TRACKER, null, -100, bottom - 50); 
         g2D.translate(-7.5, 0);
         
+        AffineTransform mid = g2D.getTransform();
+        
         if(loseTransformY > 0) {
             if(-loseTransformY < getHeight()) {
                 if(loseTransformY < 0) g2D.translate(0, -loseTransformY);
                 opponentMatrix.draw(g2D);
                 if(loseTransformY < 0) g2D.translate(0, loseTransformY);
             } else g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
-                    TetrisMatrix.BAR_WIDTH_GAP, 0);
+                    BAR_WIDTH_GAP, 0);
         } else opponentMatrix.draw(g2D);
+        
+        AffineTransform at2 = g2D.getTransform(), it2 = null;
+        try {
+            it2 = at2.createInverse();
+            it2.concatenate(mid);
+            it2.translate(130, 20);
+        } catch (NoninvertibleTransformException ex) {
+            System.err.println("Player 2\'s transform can\'t be inverted");
+        }
+        g2D.transform(it2);
+        
+        /* Shoutouts to Daniel Kvist for this code. */
+        // Get the FontMetrics
+        FontMetrics metrics2 = g2D.getFontMetrics(g2D.getFont());
+        // Determine the X coordinate for the text
+        int x2 = (int) ((MATRIX_WIDTH - metrics2.stringWidth(ServerCommunication.getOpponentName())) / 2);
+        // Draw the String
+        g2D.drawString(ServerCommunication.getOpponentName(), x2, 
+                (int) (MATRIX_HEIGHT + metrics2.getHeight()));
+        
+        try {
+            g2D.transform(it2.createInverse());
+        } catch (NoninvertibleTransformException ex) {
+            System.err.println("Player 2\'s inverse can\'t be inverted");
+        }
         
         if(centerImage != null) {
             try {
                 g2D.transform(g2D.getTransform().createInverse());
             } catch (NoninvertibleTransformException ex) {
-                System.err.println("This transform can't be inverted.");
+                System.err.println("Final transform can\'t be inverted.");
             }
             int iX = (getWidth() - centerImage.getWidth()) / 2, 
                     iY = (getHeight() - centerImage.getHeight()) / 2;
