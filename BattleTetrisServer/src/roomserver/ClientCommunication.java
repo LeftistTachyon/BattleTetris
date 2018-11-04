@@ -217,7 +217,7 @@ public class ClientCommunication {
                                         !busy.contains(otherH)) {
                                     opponent = otherH;
                                     inGame = true;
-                                    opponent.out.println("CHALLENGE_Rtrue");
+                                    opponent.out.println("CHALLENGE_Rtrue " + name);
                                     opponent.opponent = this;
                                     opponent.inGame = true;
                                     for(Handler h : handlers.values()) {
@@ -228,7 +228,7 @@ public class ClientCommunication {
                                     busy.add(opponent);
                                     busy.add(this);
                                 } else {
-                                    otherH.out.println("CHALLENGE_Rfalse");
+                                    otherH.out.println("CHALLENGE_Rfalse " + name);
                                 }
                             } else System.err.println("Opponent " + other + 
                                     " not found (168)");
