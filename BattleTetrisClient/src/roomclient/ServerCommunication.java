@@ -244,6 +244,7 @@ public class ServerCommunication {
                         inGame = Boolean.parseBoolean(data[0]);
                         if(inGame) {
                             opponentName = data[1];
+                            System.out.println("Opponent: " + opponentName);
                             out.println("SB");
                         }
                     }

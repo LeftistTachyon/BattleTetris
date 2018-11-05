@@ -1,9 +1,12 @@
 package simpletetris;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
@@ -247,8 +250,15 @@ public class TetrisPanel extends JPanel implements Runnable {
                 g2D.translate(0, loseTransformY);
                 playerMatrix.draw(g2D);
                 g2D.translate(0, -loseTransformY);
-            } else g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
+            } else {
+                g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
                     BAR_WIDTH_GAP, 0);
+                g2D.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, 
+                        BasicStroke.JOIN_MITER));
+                g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                g2D.setFont(new Font("Consolas", Font.PLAIN, 36));
+            }
         } else {
             playerMatrix.draw(g2D);
         }
@@ -265,8 +275,17 @@ public class TetrisPanel extends JPanel implements Runnable {
         /* Shoutouts to Daniel Kvist for this code. */
         // Get the FontMetrics
         FontMetrics metrics1 = g2D.getFontMetrics(g2D.getFont());
+        
+        g2D.setColor(Color.WHITE);
+        g2D.fillRect(0, (int) (MATRIX_HEIGHT + 10), 
+                (int) MATRIX_WIDTH, metrics1.getHeight());
+        g2D.setColor(Color.BLACK);
+        g2D.drawRect(0, (int) (MATRIX_HEIGHT + 10), 
+                (int) MATRIX_WIDTH, metrics1.getHeight());
+        
         // Determine the X coordinate for the text
-        int x1 = (int) ((MATRIX_WIDTH - metrics1.stringWidth(ServerCommunication.getMyName())) / 2);
+        int x1 = (int) ((MATRIX_WIDTH - metrics1.stringWidth(
+                ServerCommunication.getMyName())) / 2);
         // Draw the String
         g2D.drawString(ServerCommunication.getMyName(), x1, 
                 (int) (MATRIX_HEIGHT + metrics1.getHeight()));
@@ -304,15 +323,22 @@ public class TetrisPanel extends JPanel implements Runnable {
                 if(loseTransformY < 0) g2D.translate(0, -loseTransformY);
                 opponentMatrix.draw(g2D);
                 if(loseTransformY < 0) g2D.translate(0, loseTransformY);
-            } else g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
+            } else {
+                g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
                     BAR_WIDTH_GAP, 0);
+                g2D.setStroke(new BasicStroke(3, BasicStroke.CAP_ROUND, 
+                        BasicStroke.JOIN_MITER));
+                g2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, 
+                        RenderingHints.VALUE_ANTIALIAS_ON);
+                g2D.setFont(new Font("Consolas", Font.PLAIN, 36));
+            }
         } else opponentMatrix.draw(g2D);
         
         AffineTransform at2 = g2D.getTransform(), it2 = null;
         try {
             it2 = at2.createInverse();
             it2.concatenate(mid);
-            it2.translate(130, 20);
+            it2.translate(130, 0);
         } catch (NoninvertibleTransformException ex) {
             System.err.println("Player 2\'s transform can\'t be inverted");
         }
@@ -321,11 +347,21 @@ public class TetrisPanel extends JPanel implements Runnable {
         /* Shoutouts to Daniel Kvist for this code. */
         // Get the FontMetrics
         FontMetrics metrics2 = g2D.getFontMetrics(g2D.getFont());
+        
+        g2D.setColor(Color.WHITE);
+        g2D.fillRect(0, (int) (MATRIX_HEIGHT + 10), 
+                (int) MATRIX_WIDTH, metrics2.getHeight());
+        g2D.setColor(Color.BLACK);
+        g2D.drawRect(0, (int) (MATRIX_HEIGHT + 10), 
+                (int) MATRIX_WIDTH, metrics2.getHeight());
+        
         // Determine the X coordinate for the text
-        int x2 = (int) ((MATRIX_WIDTH - metrics2.stringWidth(ServerCommunication.getOpponentName())) / 2);
+        int x2 = (int) ((MATRIX_WIDTH - metrics2.stringWidth(
+                ServerCommunication.getOpponentName())) / 2);
         // Draw the String
+        g2D.setColor(Color.BLACK);
         g2D.drawString(ServerCommunication.getOpponentName(), x2, 
-                (int) (MATRIX_HEIGHT + metrics2.getHeight()));
+                (int) (MATRIX_HEIGHT + metrics1.getHeight()));
         
         try {
             g2D.transform(it2.createInverse());
