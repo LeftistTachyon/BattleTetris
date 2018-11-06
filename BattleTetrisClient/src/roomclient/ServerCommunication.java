@@ -210,6 +210,9 @@ public class ServerCommunication {
                                     out.println(e.getActionCommand());
                                 });
                             }
+                        } else if(line.startsWith("GL")) {
+                            if(tFrame != null)
+                                tFrame.opponent.dumpGarbage(line.substring(2));
                         }
                     }
                 } else {

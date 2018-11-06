@@ -1,7 +1,5 @@
 package roomclient;
 
-import java.util.Scanner;
-
 /**
  * The main class for this client
  * @author Jed Wang

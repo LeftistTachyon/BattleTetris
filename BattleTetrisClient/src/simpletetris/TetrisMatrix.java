@@ -535,7 +535,7 @@ public class TetrisMatrix {
                 
                 // gravity.enable();
                 
-                addGarbage();
+                if(onLeft) addGarbage();
                 
                 newPiece();
             } else {
@@ -674,6 +674,34 @@ public class TetrisMatrix {
         }
         
         g2D.translate(110, 0);
+    }
+    
+    /**
+     * Adds garbage to the bottom of this matrix.
+     * @param garbageDump the garbage to add
+     */
+    public void dumpGarbage(String garbageDump) {
+        String[] data = garbageDump.split(" ");
+        if(data.length%2 != 0) 
+            throw new IllegalArgumentException("Illegal garbage dump");
+        for(int i = 0; i < data.length; i += 2) {
+            int a = Integer.parseInt(data[i]), b = Integer.parseInt(data[i+1]);
+            // a is the column which the hole is in
+            // b is the number of lines  to drop
+            if(b > HEIGHT) b = HEIGHT;
+        
+            for(int j = b; j < HEIGHT; j++) {
+                pushUpLine(j, b);
+            }
+
+            for(int j = 0; j < b; j++) {
+                emptyLine(HEIGHT - j - 1);
+            }
+            
+            for(int j = 0; j < b; j++) {
+                setGarbageLine(HEIGHT - j - 1, a);
+            }
+        }
     }
     
     /**
@@ -974,7 +1002,7 @@ public class TetrisMatrix {
         // after locking, reset
         if(linesCleared == 0) {
             // add garbage
-            addGarbage();
+            if(onLeft) addGarbage();
             newPiece();
         } else {
             falling = null;
@@ -1138,19 +1166,19 @@ public class TetrisMatrix {
     public void addGarbageLines(int lines) {
         if(lines > HEIGHT) lines = HEIGHT;
         
-       for(int i = lines; i < HEIGHT; i++) {
-           pushUpLine(i, lines);
-       }
+        for(int i = lines; i < HEIGHT; i++) {
+            pushUpLine(i, lines);
+        }
        
         for(int i = 0; i < lines; i++) {
             emptyLine(HEIGHT - i - 1);
         }
        
-       int hole = (int) (Math.random() * WIDTH);
-       for(int i = 0; i < lines; i++) {
-           if(Math.random() < 0.25) hole = (int) (Math.random() * WIDTH);
-           setGarbageLine(HEIGHT - i - 1, hole);
-       }
+        int hole = (int) (Math.random() * WIDTH);
+        for(int i = 0; i < lines; i++) {
+            if(Math.random() < 0.25) hole = (int) (Math.random() * WIDTH);
+            setGarbageLine(HEIGHT - i - 1, hole);
+        }
     }
     
     /**
