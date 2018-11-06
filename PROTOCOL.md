@@ -30,6 +30,7 @@ This protocol table is for communication between clients in-game (for Tetris).
 |`LOCK`             |`[int x] [int y]`                      |None, but locks the piece in place in the given coordinates       |
 |`M` (move)         |`[String move]` L, R, RR, RL, H, SD, HD|None, but executes the action.                                    |
 |`SB` (starting bag)|none                                   |Gives the order of both bags, first this person, then the opponent|
+|`GL` (garb lines)  |`[int hole] [int lines] ...`           |None, but dumps garbage onto the bottom                           |
   
 This protocol table is for communication between clients for chatting.  
   
