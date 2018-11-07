@@ -60,14 +60,12 @@ public class TetrisFrame extends JFrame {
                     AudioPlayer.playWinMatchSFX();
                     JOptionPane.showMessageDialog(_this, "You Won!",
                             "Game Over", JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0);
                 } else {
                     // I lost....
                     AudioPlayer.stopBackgroundMusic();
                     AudioPlayer.playLoseMatchSFX();
                     JOptionPane.showMessageDialog(_this, "You lost.",
                             "Game Over", JOptionPane.INFORMATION_MESSAGE);
-                    System.exit(0);
                 }
             } else notifyListener(message);
         });

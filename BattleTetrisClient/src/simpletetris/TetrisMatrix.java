@@ -1029,15 +1029,14 @@ public class TetrisMatrix {
             int temptemp = gh.peekNextGarbage();
             if(temptemp == 0) break;
             temp += temptemp;
-            toNotify += addGarbageLines(gh.getNextGarbage());
-            System.out.println("Dump: "+toNotify);
+            toNotify += addGarbageLines(gh.getNextGarbage()) + " ";
             addedGarbage = true;
             System.out.println("Oof! " + temptemp + " lines of garbage");
             
             if(temp > 5) break;
         }
         if(addedGarbage) {
-            notifyListeners("GL" + toNotify);
+            notifyListeners("GL" + toNotify.trim());
             AudioPlayer.playGarbageSFX();
         }
     }
