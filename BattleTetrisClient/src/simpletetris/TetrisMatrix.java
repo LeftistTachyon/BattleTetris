@@ -321,7 +321,6 @@ public class TetrisMatrix {
         
         kicked = false;
         hold = null;
-        matrix = new Color[WIDTH][HEIGHT];
         bag = new TetrisBag(!onLeft);
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
@@ -350,6 +349,13 @@ public class TetrisMatrix {
             service = Executors.newScheduledThreadPool(1);
             service.scheduleAtFixedRate(gravity, 0, 10, TimeUnit.MILLISECONDS);
         }
+    }
+    
+    /**
+     * Clears the matrix.
+     */
+    public void clearMatrix() {
+        matrix = new Color[WIDTH][HEIGHT];
     }
     
     /**
@@ -816,8 +822,10 @@ public class TetrisMatrix {
                 break;
             case HARD_DROP:
                 int gY = getGhostY();
-                if(y != gY) lastAction = ga;
-                y = gY;
+                if(y != gY) {
+                    lastAction = ga;
+                    y = gY;
+                }
                 if(onLeft) lockPiece();
                 AudioPlayer.playMoveSFX(1.0);
                 break;
