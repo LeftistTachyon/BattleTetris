@@ -316,11 +316,11 @@ public class TetrisPanel extends JPanel implements Runnable {
         
         AffineTransform mid = g2D.getTransform();
         
-        if(loseTransformY > 0) {
+        if(loseTransformY < 0) {
             if(-loseTransformY < getHeight()) {
-                if(loseTransformY < 0) g2D.translate(0, -loseTransformY);
+                g2D.translate(0, -loseTransformY);
                 opponentMatrix.draw(g2D);
-                if(loseTransformY < 0) g2D.translate(0, loseTransformY);
+                g2D.translate(0, loseTransformY);
             } else {
                 g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
                     BAR_WIDTH_GAP, 0);
