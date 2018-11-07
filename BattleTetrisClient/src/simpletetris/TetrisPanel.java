@@ -148,8 +148,6 @@ public class TetrisPanel extends JPanel implements Runnable {
             String command = e.getActionCommand();
             if(command.equals("GAMEOVER")) {
                 opponentScore++;
-                playerMatrix.clearFalling();
-                opponentMatrix.clearFalling();
                 System.out.println("You lose. :(");
                 AudioPlayer.stopBackgroundMusic();
                 AudioPlayer.playLoseGameSFX();
@@ -170,8 +168,6 @@ public class TetrisPanel extends JPanel implements Runnable {
             String command = e.getActionCommand();
             if(command.equals("GAMEOVER")) {
                 playerScore++;
-                playerMatrix.clearFalling();
-                opponentMatrix.clearFalling();
                 System.out.println("You win! :)");
                 AudioPlayer.stopBackgroundMusic();
                 AudioPlayer.playWinGameSFX();
@@ -208,6 +204,8 @@ public class TetrisPanel extends JPanel implements Runnable {
             try {
                 loseTransformV = 0;
                 loseTransformY = 0;
+                playerMatrix.clearMatrix();
+                opponentMatrix.clearMatrix();
                 AudioPlayer.playInGameBackground();
                 centerImage = READY;
                 Thread.sleep(1000);
