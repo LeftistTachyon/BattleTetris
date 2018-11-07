@@ -21,6 +21,7 @@ import static simpletetris.TetrisKeyAdapter.GameAction.*;
 import static simpletetris.Mino.*;
 import static java.awt.Color.*;
 import java.awt.RenderingHints;
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 /**
@@ -683,7 +684,7 @@ public class TetrisMatrix {
     public void dumpGarbage(String garbageDump) {
         String[] data = garbageDump.split(" ");
         if(data.length%2 != 0) 
-            throw new IllegalArgumentException("Illegal garbage dump");
+            throw new IllegalArgumentException("Illegal garbage dump: " + Arrays.toString(data));
         for(int i = 0; i < data.length; i += 2) {
             int a = Integer.parseInt(data[i]), b = Integer.parseInt(data[i+1]);
             // a is the column which the hole is in
@@ -1023,17 +1024,21 @@ public class TetrisMatrix {
     private void addGarbage() {
         int temp = 0;
         boolean addedGarbage = false;
+        String toNotify = "";
         while(true) {
             int temptemp = gh.peekNextGarbage();
             if(temptemp == 0) break;
             temp += temptemp;
-            addGarbageLines(gh.getNextGarbage());
+            toNotify += addGarbageLines(gh.getNextGarbage());
             addedGarbage = true;
             System.out.println("Oof! " + temptemp + " lines of garbage");
             
             if(temp > 5) break;
         }
-        if(addedGarbage) AudioPlayer.playGarbageSFX();
+        if(addedGarbage) {
+            notifyListeners("GL" + toNotify);
+            AudioPlayer.playGarbageSFX();
+        }
     }
     
     /**
@@ -1162,8 +1167,9 @@ public class TetrisMatrix {
     /**
      * Adds a given amount of garbage lines to the bottom of the matrix.
      * @param lines how many garbage lines to add
+     * @return the garbage pattern
      */
-    public void addGarbageLines(int lines) {
+    public String addGarbageLines(int lines) {
         if(lines > HEIGHT) lines = HEIGHT;
         
         for(int i = lines; i < HEIGHT; i++) {
@@ -1175,10 +1181,21 @@ public class TetrisMatrix {
         }
        
         int hole = (int) (Math.random() * WIDTH);
+        int cnt = 0;
+        String output = "";
         for(int i = 0; i < lines; i++) {
-            if(Math.random() < 0.25) hole = (int) (Math.random() * WIDTH);
+            if(Math.random() < 0.25) {
+                if(cnt != 0) {
+                    output += hole + " " + cnt + " ";
+                    cnt = 0;
+                }
+                hole = (int) (Math.random() * WIDTH);
+            }
             setGarbageLine(HEIGHT - i - 1, hole);
+            cnt++;
         }
+        output += hole + " " + cnt + " ";
+        return output.trim();
     }
     
     /**
