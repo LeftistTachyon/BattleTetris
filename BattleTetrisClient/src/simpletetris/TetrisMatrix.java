@@ -1030,6 +1030,7 @@ public class TetrisMatrix {
             if(temptemp == 0) break;
             temp += temptemp;
             toNotify += addGarbageLines(gh.getNextGarbage());
+            System.out.println("Dump: "+toNotify);
             addedGarbage = true;
             System.out.println("Oof! " + temptemp + " lines of garbage");
             
