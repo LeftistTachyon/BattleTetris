@@ -1,1 +1,7 @@
 language: java
+install: ant deps
+env:
+ - TEST_DIR=BattleTetrisClient
+ - TEST_DIR=BattleTetrisServer
+script:
+ - cd $TEST_DIR && ant test
