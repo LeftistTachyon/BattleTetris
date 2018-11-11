@@ -171,6 +171,27 @@ public class ServerCommunication {
                             tFrame.dispose();
                             tFrame = null;
                         }
+                    } else if(line.equals("ST")) {
+                        Dimension ss = 
+                                Toolkit.getDefaultToolkit().getScreenSize();
+                        tFrame = new TetrisFrame();
+                        tFrame.setLocation(
+                                (ss.width - tFrame.getWidth()) / 2, 
+                                (ss.height - tFrame.getHeight()) / 2);
+                        tFrame.addWindowListener(new WindowAdapter() {
+                            @Override
+                            public void windowClosed(WindowEvent e) {
+                                System.err.println("Closin\'!");
+                                super.windowClosing(e);
+                                inGame = false;
+                                AudioPlayer.stopBackgroundMusic();
+                                ((TetrisFrame)e.getWindow()).terminate();
+                                out.println("EXIT");
+                            }
+                        });
+                        tFrame.setActionListener((ActionEvent e) -> {
+                            out.println(e.getActionCommand());
+                        });
                     } else {
                         if(line.startsWith("NB")) {
                             if(tFrame != null)
@@ -190,28 +211,6 @@ public class ServerCommunication {
                             String[] bags = line.substring(2).split(" ");
                             TetrisBag.RAM_BAG_THIS = bags[0];
                             TetrisBag.RAM_BAG_THAT = bags[1];
-                            if(tFrame == null) {
-                                Dimension ss = 
-                                        Toolkit.getDefaultToolkit().getScreenSize();
-                                tFrame = new TetrisFrame();
-                                tFrame.setLocation(
-                                        (ss.width - tFrame.getWidth()) / 2, 
-                                        (ss.height - tFrame.getHeight()) / 2);
-                                tFrame.addWindowListener(new WindowAdapter() {
-                                    @Override
-                                    public void windowClosed(WindowEvent e) {
-                                        System.err.println("Closin\'!");
-                                        super.windowClosing(e);
-                                        inGame = false;
-                                        AudioPlayer.stopBackgroundMusic();
-                                        ((TetrisFrame)e.getWindow()).terminate();
-                                        out.println("EXIT");
-                                    }
-                                });
-                                tFrame.setActionListener((ActionEvent e) -> {
-                                    out.println(e.getActionCommand());
-                                });
-                            }
                         } else if(line.startsWith("GL")) {
                             if(tFrame != null)
                                 tFrame.opponent.dumpGarbage(line.substring(2));

@@ -79,6 +79,11 @@ public class ClientCommunication {
         private static final Object BAG_LOCK = new Object();
         
         /**
+         * A counter that lets games start together.
+         */
+        private int startCntr;
+        
+        /**
          * Constructs a handler thread, squirreling away the socket.
          * All the interesting work is done in the run method.
          * @param socket the socket that receives info from the client
@@ -87,6 +92,7 @@ public class ClientCommunication {
             this.socket = socket;
             inGame = false;
             opponent = null;
+            startCntr = 0;
         }
 
         /**
@@ -162,6 +168,7 @@ public class ClientCommunication {
                             for(Handler h : handlers.values()) {
                                 h.out.println("FREE" + name);
                             }
+                            startCntr = 0;
                             if(opponent != null) {
                                 opponent.out.println("EXIT");
                                 opponent.inGame = false;
@@ -170,10 +177,17 @@ public class ClientCommunication {
                                     h.out.println("FREE" + opponent.name);
                                 }
                                 
+                                opponent.startCntr = 0;
                                 opponent = null;
                             }
                         } else if(line.equals("SB")) {
                             synchronized(BAG_LOCK) {
+                                startCntr++;
+                                opponent.startCntr++;
+                                if(startCntr != opponent.startCntr) 
+                                    throw new IllegalStateException(
+                                            "The startCntrs between two "
+                                                    + "opponents are different.");
                                 if(loadedBagOpp == null || loadedBagThis == null) {
                                     String thisBag = newBag(), thatBag = newBag();
                                     String toSend = "SB" + thisBag + " " + thatBag;
@@ -190,6 +204,10 @@ public class ClientCommunication {
                                     println(toSend);
                                     loadedBagThis = null;
                                     loadedBagOpp = null;
+                                }
+                                if(startCntr == 2) {
+                                    out.println("ST");
+                                    opponent.println("ST");
                                 }
                             }
                         } else opponent.out.println(line);
