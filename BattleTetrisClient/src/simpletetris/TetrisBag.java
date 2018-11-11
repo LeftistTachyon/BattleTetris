@@ -133,7 +133,7 @@ public class TetrisBag {
     }
     
     /**
-     * The listener which islistening in
+     * The listener which is listening in.
      */
     private ActionListener listener = null;
     

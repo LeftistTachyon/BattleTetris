@@ -148,8 +148,6 @@ public class TetrisPanel extends JPanel implements Runnable {
             String command = e.getActionCommand();
             if(command.equals("GAMEOVER")) {
                 opponentScore++;
-                playerMatrix.clearFalling();
-                opponentMatrix.clearFalling();
                 System.out.println("You lose. :(");
                 AudioPlayer.stopBackgroundMusic();
                 AudioPlayer.playLoseGameSFX();
@@ -174,8 +172,6 @@ public class TetrisPanel extends JPanel implements Runnable {
             String command = e.getActionCommand();
             if(command.equals("GAMEOVER")) {
                 playerScore++;
-                playerMatrix.clearFalling();
-                opponentMatrix.clearFalling();
                 System.out.println("You win! :)");
                 AudioPlayer.stopBackgroundMusic();
                 AudioPlayer.playWinGameSFX();
@@ -217,6 +213,8 @@ public class TetrisPanel extends JPanel implements Runnable {
             try {
                 loseTransformV = 0;
                 loseTransformY = 0;
+                playerMatrix.clearMatrix();
+                opponentMatrix.clearMatrix();
                 AudioPlayer.playInGameBackground();
                 centerImage = READY;
                 Thread.sleep(1000);
@@ -327,11 +325,11 @@ public class TetrisPanel extends JPanel implements Runnable {
         
         AffineTransform mid = g2D.getTransform();
         
-        if(loseTransformY > 0) {
+        if(loseTransformY < 0) {
             if(-loseTransformY < getHeight()) {
-                if(loseTransformY < 0) g2D.translate(0, -loseTransformY);
+                g2D.translate(0, -loseTransformY);
                 opponentMatrix.draw(g2D);
-                if(loseTransformY < 0) g2D.translate(0, loseTransformY);
+                g2D.translate(0, loseTransformY);
             } else {
                 g2D.translate(235 + Mino.MINO_WIDTH*TetrisMatrix.WIDTH - 
                     BAR_WIDTH_GAP, 0);
