@@ -140,7 +140,6 @@ public class ServerCommunication {
                 String[] data = line.substring(9).split(" ");
                 
                 String newClient = data[1];
-                System.out.println("new client: " + newClient);
                 lw.addPlayer(newClient);
                 status.put(newClient, false);
                 
@@ -201,8 +200,11 @@ public class ServerCommunication {
                                 tFrame.addWindowListener(new WindowAdapter() {
                                     @Override
                                     public void windowClosed(WindowEvent e) {
+                                        System.err.println("Closin\'!");
+                                        super.windowClosing(e);
                                         inGame = false;
                                         AudioPlayer.stopBackgroundMusic();
+                                        ((TetrisFrame)e.getWindow()).terminate();
                                         out.println("EXIT");
                                     }
                                 });

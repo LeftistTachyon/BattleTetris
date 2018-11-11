@@ -347,4 +347,12 @@ public class GarbageHandler {
     public boolean isB2B() {
         return b2b;
     }
+    
+    /**
+     * Removes a set amount of lines from the garbage queue
+     * @param lines the amount of lines to remove from the queue
+     */
+    public void removeLines(int lines) {
+        counterGarbage(lines + "");
+    }
 }

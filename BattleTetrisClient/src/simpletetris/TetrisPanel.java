@@ -159,7 +159,11 @@ public class TetrisPanel extends JPanel implements Runnable {
                         .schedule(() -> {
                     if(opponentScore == 2) {
                         notifyListeners("MATCHOVERfalse");
-                    } else startGame();
+                    } else {
+                        playerMatrix.resetBags();
+                        opponentMatrix.resetBags();
+                        startGame();
+                    }
                 }, 5, TimeUnit.SECONDS);
             } else if(command.startsWith("SEND")) {
                 opponentMatrix.addToGarbage(command.substring(4));
@@ -181,7 +185,11 @@ public class TetrisPanel extends JPanel implements Runnable {
                         .schedule(() -> {
                     if(playerScore == 2) {
                         notifyListeners("MATCHOVERtrue");
-                    } else startGame();
+                    } else {
+                        playerMatrix.resetBags();
+                        opponentMatrix.resetBags();
+                        startGame();
+                    }
                 }, 5, TimeUnit.SECONDS);
             } else if(command.startsWith("SEND")) {
                 playerMatrix.addToGarbage(command.substring(4));
@@ -198,6 +206,7 @@ public class TetrisPanel extends JPanel implements Runnable {
         tka.setListening(false);
         playerMatrix.reset();
         opponentMatrix.reset();
+        notifyListeners("SB");
     }
     
     /**
@@ -466,5 +475,15 @@ public class TetrisPanel extends JPanel implements Runnable {
         for(ActionListener al : listeners) {
             al.actionPerformed(ae);
         }
+    }
+    
+    /**
+     * Terminates all processes to prevent the game 
+     * continuing in the background.
+     */
+    public void terminate() {
+        stop = true;
+        playerMatrix.terminate();
+        opponentMatrix.terminate();
     }
 }

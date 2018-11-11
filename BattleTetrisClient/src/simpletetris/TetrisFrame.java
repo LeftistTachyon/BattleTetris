@@ -109,4 +109,13 @@ public class TetrisFrame extends JFrame {
         super.setVisible(true);
         new Thread(panel).start();
     }
+    
+    /**
+     * Terminates all processes.
+     * Prevents the continuation of the game while the window is closed.
+     */
+    public void terminate() {
+        listener = null;
+        panel.terminate();
+    }
 }

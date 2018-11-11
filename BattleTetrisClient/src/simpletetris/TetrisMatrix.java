@@ -312,7 +312,7 @@ public class TetrisMatrix {
      */
     public void reset() {
         if(service != null) service.shutdown();
-        service = null;
+        // service = null;
         falling = null;
         
         gh.reset();
@@ -322,11 +322,6 @@ public class TetrisMatrix {
         kicked = false;
         hold = null;
         matrix = new Color[WIDTH][HEIGHT];
-        bag = new TetrisBag(!onLeft);
-        bag.setActionListener((ActionEvent e) -> {
-            notifyListeners(e.getActionCommand());
-        });
-        bag.regenerateBag();
         /*if(!onLeft) {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
@@ -334,6 +329,23 @@ public class TetrisMatrix {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
         }*/
+    }
+    
+    /**
+     * Resets the bags.
+     */
+    public void resetBags() {
+        bag = new TetrisBag(!onLeft);
+        bag.setActionListener((ActionEvent e) -> {
+            notifyListeners(e.getActionCommand());
+        });
+        if(onLeft) {
+            bag.addBag(TetrisBag.RAM_BAG_THIS);
+            TetrisBag.RAM_BAG_THIS = null;
+        } else {
+            bag.addBag(TetrisBag.RAM_BAG_THAT);
+            TetrisBag.RAM_BAG_THAT = null;
+        }
     }
     
     /**
@@ -702,6 +714,8 @@ public class TetrisMatrix {
             for(int j = 0; j < b; j++) {
                 setGarbageLine(HEIGHT - j - 1, a);
             }
+            
+            gh.removeLines(b);
         }
     }
     
@@ -767,7 +781,7 @@ public class TetrisMatrix {
      * @param ga the action to execute.
      */
     public void executeAction(GameAction ga) {
-        if(falling == null) return;
+        if(falling == null || terminated) return;
         switch(ga) {
             case ROTATE_LEFT:
                 Point kickL = falling.getWallKick(this, 
@@ -1533,5 +1547,20 @@ public class TetrisMatrix {
      */
     public void addBag(String bag) {
         this.bag.addBag(bag);
+    }
+    
+    /**
+     * Whether this TetrisMatrix's {@code terminate} method 
+     * has been called yet.
+     */
+    private boolean terminated = false;
+    
+    /**
+     * Terminates all actions to prevent the game from 
+     * continuing in the background.
+     */
+    public void terminate() {
+        terminated = true;
+        service.shutdownNow();
     }
 }
