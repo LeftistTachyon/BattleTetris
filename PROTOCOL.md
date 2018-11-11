@@ -32,6 +32,7 @@ This protocol table is for communication between clients in-game (for Tetris).
 |`GC` gravitycommand|`[String command]` P, R                |None, but executes the gravity command.                           |
 |`SB` (starting bag)|none                                   |Gives the order of both bags, first this person, then the opponent|
 |`GL` (garb lines)  |`[int hole] [int lines] ...`           |None, but dumps garbage onto the bottom                           |
+|`ST` (start)       |none                                   |None, but starts the game.                                        |
   
 This protocol table is for communication between clients for chatting.  
   
