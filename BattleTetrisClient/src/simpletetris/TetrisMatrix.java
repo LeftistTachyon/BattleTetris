@@ -321,15 +321,11 @@ public class TetrisMatrix {
         
         kicked = false;
         hold = null;
-<<<<<<< HEAD
-        matrix = new Color[WIDTH][HEIGHT];
-=======
         bag = new TetrisBag(!onLeft);
         bag.setActionListener((ActionEvent e) -> {
             notifyListeners(e.getActionCommand());
         });
         bag.regenerateBag();
->>>>>>> 52b7f52f4f7c68a6313b10639eb4262fcfd7be27
         /*if(!onLeft) {
             bag.addBag("OOOOOOO");
             bag.addBag("OOOOOOO");
