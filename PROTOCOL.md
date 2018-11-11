@@ -29,6 +29,7 @@ This protocol table is for communication between clients in-game (for Tetris).
 |`NB` (new bag)     |`[String bagOrder]`                    |None, but adds a new bag to the matrix.                           |
 |`LOCK`             |`[int x] [int y]`                      |None, but locks the piece in place in the given coordinates       |
 |`M` (move)         |`[String move]` L, R, RR, RL, H, SD, HD|None, but executes the action.                                    |
+|`GC` gravitycommand|`[String command]` P, R                |None, but executes the gravity command.                           |
 |`SB` (starting bag)|none                                   |Gives the order of both bags, first this person, then the opponent|
 |`GL` (garb lines)  |`[int hole] [int lines] ...`           |None, but dumps garbage onto the bottom                           |
   
