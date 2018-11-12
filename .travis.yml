@@ -7,4 +7,4 @@ env:
    STAGE_NAME=Server
 script:
  - stage:STAGE_NAME
-   cd $TEST_DIR && ant test
+ - cd $TEST_DIR && ant test
