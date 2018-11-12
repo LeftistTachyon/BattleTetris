@@ -2,9 +2,6 @@ language: java
 # install: ant deps
 env:
  - TEST_DIR=BattleTetrisClient
-   STAGE_NAME=Client
  - TEST_DIR=BattleTetrisServer
-   STAGE_NAME=Server
 script:
- - stage:STAGE_NAME
  - cd $TEST_DIR && ant test
