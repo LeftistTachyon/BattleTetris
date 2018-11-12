@@ -314,10 +314,29 @@ public class ClientCommunication {
         
         /**
          * Returns the client's name
-         * @return the client's name
+         * @return the client's name 
          */
         public String getClientName() {
             return name;
         }
+    }
+    
+    /**
+     * Processes a command from the admin.
+     * @param command the command to process; 
+     * in the format <code>[body] [stuff]...</code>.
+     * @return the message to print out for the admin's console
+     */
+    public static String processCommand(String command) {
+        return "";
+    }
+    
+    /**
+     * Sends a message to all clients.
+     * The "user" which "sends" the message is [ADMIN].
+     * @param message the message to send
+     */
+    public static void distributeMessage(String message) {
+        
     }
 }
