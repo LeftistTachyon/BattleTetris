@@ -3,9 +3,12 @@ package roomserver;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
+import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -16,6 +19,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
+import javax.swing.event.ListSelectionEvent;
 
 public class ServerUI extends JFrame {
     
@@ -52,7 +56,13 @@ public class ServerUI extends JFrame {
         playerList.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         playerList.setModel(playerLModel);
         playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        // playerList.addListSelectionListener(this::playerSelected);
+        playerList.addListSelectionListener(this::playerSelected);
+        playerList.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent me) {
+                playerSelected(me);
+            }
+        });
         listSP.setViewportView(playerList);
 
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -89,12 +99,37 @@ public class ServerUI extends JFrame {
      * @param evt the ActionEvent that is generated
      */
     private void sendMessage(ActionEvent evt) {                                            
-        String message = evt.getActionCommand();
+        String message = textField.getText();
+        textField.setText("");
         if(message.startsWith("/")) {
-            ClientCommunication.processCommand(message.substring(1));
+            chatHist.add(ClientCommunication.processCommand(
+                    message.substring(1)));
         } else {
-            
+            String temp = "[ADMIN]: " + message;
+            chatHist.add(temp);
+            ClientCommunication.distributeMessage(temp);
         }
+        updateChat();
+    }
+    
+    /**
+     * Activated when the admin double clicks a user on the list
+     * @param lse the ListSelectionEvent that is generated
+     */
+    private void playerSelected(ListSelectionEvent lse) {
+        // textField.setText(textField.getText() + playerList.getSelectedValue());
+    }
+    
+    /**
+     * Activated when the admin double clicks a user on the list
+     * @param me the MouseEvent that is generated
+     */
+    private void playerSelected(MouseEvent me) {
+        int idx = playerList.locationToIndex(me.getPoint());
+        System.out.println(":" + idx);
+        String selected = playerLModel.get(idx);
+        if(selected != null) 
+            textField.setText(textField.getText() + selected);
     }
     
     /**
@@ -156,6 +191,7 @@ public class ServerUI extends JFrame {
         ServerUI output = new ServerUI();
         EventQueue.invokeLater(() -> {
             output.setVisible(true);
+            output.updateChat();
         });
         return output;
     }
@@ -166,7 +202,7 @@ public class ServerUI extends JFrame {
     private JScrollPane listSP;
     
     private JScrollPane chatSP;
-    private JTextPane chatPane;
+    private JEditorPane chatPane;
     private LinkedList<String> chatHist;
     
     private JTextField textField;

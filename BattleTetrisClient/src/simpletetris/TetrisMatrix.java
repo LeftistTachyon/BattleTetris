@@ -1338,6 +1338,7 @@ public class TetrisMatrix {
      * Pauses gravity.
      */
     public void pauseGravity() {
+        notifyListeners("GCP");
         gravity.pause();
     }
     
@@ -1345,6 +1346,7 @@ public class TetrisMatrix {
      * Resumes gravity.
      */
     public void resumeGravity() {
+        notifyListeners("GCR");
         gravity.resume();
     }
     

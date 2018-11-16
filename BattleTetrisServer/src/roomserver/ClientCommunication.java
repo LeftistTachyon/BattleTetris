@@ -25,12 +25,25 @@ public class ClientCommunication {
     /**
      * A map of all names of clients paired to their respective Handlers.
      */
-    private static HashMap<String, Handler> handlers = new HashMap<>();
+    private final static HashMap<String, Handler> HANDLERS = new HashMap<>();
     
     /**
      * A Set of Handlers which are busy
      */
     private static Set<Handler> busy = new HashSet<>();
+    
+    /**
+     * The ServerUI for this admin.
+     */
+    private static ServerUI serverUI;
+    
+    /**
+     * Starts the serverUI.
+     */
+    public static void startServerUI() {
+        serverUI = new ServerUI();
+        serverUI.setVisible(true); /*Stopgap*/
+    }
     
     /**
      * A handler thread class.  Handlers are spawned from the listening
@@ -121,13 +134,14 @@ public class ClientCommunication {
                     // notify(name, true);
                     if(name == null) return;
                     if("".equals(name) || "null".equals(name)) continue;
-                    synchronized(handlers) {
-                        if(!handlers.containsKey(name)) {
-                            HashSet<String> copy = new HashSet<>(handlers.keySet());
-                            for(Handler h : handlers.values()) {
+                    synchronized(HANDLERS) {
+                        if(!HANDLERS.containsKey(name)) {
+                            HashSet<String> copy = new HashSet<>(HANDLERS.keySet());
+                            for(Handler h : HANDLERS.values()) {
                                 h.out.println("NEWCLIENTtrue " + name);
                             }
-                            handlers.put(name, this);
+                            HANDLERS.put(name, this);
+                            serverUI.addPlayer(name);
                             for(String s : copy) {
                                 out.println("NEWCLIENTfalse " + s);
                             }
@@ -158,14 +172,14 @@ public class ClientCommunication {
                         out.println("PING");
                     } else if(line.startsWith("NLM")) {
                         String message = "NLM" + name + ": " + line.substring(3);
-                        for(Handler h : handlers.values()) {
+                        for(Handler h : HANDLERS.values()) {
                             h.out.println(message);
                         }
                     } else if(inGame) {
                         if(line.equals("EXIT")) {
                             inGame = false;
                             busy.remove(this);
-                            for(Handler h : handlers.values()) {
+                            for(Handler h : HANDLERS.values()) {
                                 h.out.println("FREE" + name);
                             }
                             startCntr = 0;
@@ -173,7 +187,7 @@ public class ClientCommunication {
                                 opponent.out.println("EXIT");
                                 opponent.inGame = false;
                                 busy.remove(opponent);
-                                for(Handler h : handlers.values()) {
+                                for(Handler h : HANDLERS.values()) {
                                     h.out.println("FREE" + opponent.name);
                                 }
                                 
@@ -207,7 +221,7 @@ public class ClientCommunication {
                                 }
                                 if(startCntr == 2) {
                                     out.println("ST");
-                                    opponent.println("ST");
+                                    opponent.out.println("ST");
                                 }
                             }
                         } else opponent.out.println(line);
@@ -218,8 +232,8 @@ public class ClientCommunication {
                             if(toChallenge.equals(name))
                                 continue;
                             
-                            if(handlers.containsKey(toChallenge)) {
-                                handlers.get(toChallenge).
+                            if(HANDLERS.containsKey(toChallenge)) {
+                                HANDLERS.get(toChallenge).
                                         out.println("CHALLENGE_C" + name);
                             } else System.err.println("Opponent " + toChallenge 
                                     + " not found (149)");
@@ -229,8 +243,8 @@ public class ClientCommunication {
                             
                             // Accepted!
                             String other = temp.next();
-                            if(handlers.containsKey(other)) {
-                                Handler otherH = handlers.get(other);
+                            if(HANDLERS.containsKey(other)) {
+                                Handler otherH = HANDLERS.get(other);
                                 if(temp.nextBoolean() && 
                                         !busy.contains(otherH)) {
                                     opponent = otherH;
@@ -238,7 +252,7 @@ public class ClientCommunication {
                                     opponent.out.println("CHALLENGE_Rtrue " + name);
                                     opponent.opponent = this;
                                     opponent.inGame = true;
-                                    for(Handler h : handlers.values()) {
+                                    for(Handler h : HANDLERS.values()) {
                                         h.out.println("BUSY" + name);
                                         h.out.println("BUSY" + opponent.name);
                                     }
@@ -258,18 +272,19 @@ public class ClientCommunication {
             } finally {
                 // This client is going down!  Remove its name and its print
                 // writer from the sets, and close its socket.
-                for(Handler h : handlers.values()) {
+                for(Handler h : HANDLERS.values()) {
                     h.out.println("REMOVECLIENT" + name);
                 }
                 if(opponent != null) {
                     opponent.out.println("EXIT");
                     opponent.inGame = false;
-                    for(Handler h : handlers.values()) {
+                    for(Handler h : HANDLERS.values()) {
                         h.out.println("FREE" + opponent.name);
                     }
                 }
-                if(handlers != null) {
-                    handlers.remove(name);
+                if(HANDLERS != null) {
+                    HANDLERS.remove(name);
+                    serverUI.removePlayer(name);
                 }
                 out.close();
                 try {
@@ -337,6 +352,8 @@ public class ClientCommunication {
      * @param message the message to send
      */
     public static void distributeMessage(String message) {
-        
+        for(Handler h : HANDLERS.values()) {
+            h.out.println(message);
+        }
     }
 }

@@ -214,6 +214,17 @@ public class ServerCommunication {
                         } else if(line.startsWith("GL")) {
                             if(tFrame != null)
                                 tFrame.opponent.dumpGarbage(line.substring(2));
+                        } else if(line.startsWith("GC")) {
+                            if(tFrame != null) {
+                                switch(line.substring(2)) {
+                                    case "P":
+                                        tFrame.opponent.pauseGravity();
+                                        break;
+                                    case "R":
+                                        tFrame.opponent.resumeGravity();
+                                        break;
+                                }
+                            }
                         }
                     }
                 } else {

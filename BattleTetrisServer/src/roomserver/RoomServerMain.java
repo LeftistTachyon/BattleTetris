@@ -16,7 +16,9 @@ public class RoomServerMain {
      * @throws java.io.IOException if something goes wrong
      */
     public static void main(String[] args) throws IOException {
-        System.out.println("The Tetris server is running.");
+        // System.out.println("The Tetris server is running.");
+        
+        ClientCommunication.startServerUI();
         
         /*MainWindow mw = new MainWindow();
         Handler.setMainWindow(mw);*/
