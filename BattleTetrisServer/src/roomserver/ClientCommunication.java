@@ -353,7 +353,7 @@ public class ClientCommunication {
      */
     public static void distributeMessage(String message) {
         for(Handler h : HANDLERS.values()) {
-            h.out.println(message);
+            h.out.println("NLM[ADMIN]: " + message);
         }
     }
 }

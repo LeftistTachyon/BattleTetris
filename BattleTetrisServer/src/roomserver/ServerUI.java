@@ -56,7 +56,6 @@ public class ServerUI extends JFrame {
         playerList.setFont(new Font("Segoe UI", 0, 14)); // NOI18N
         playerList.setModel(playerLModel);
         playerList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        playerList.addListSelectionListener(this::playerSelected);
         playerList.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent me) {
@@ -105,19 +104,10 @@ public class ServerUI extends JFrame {
             chatHist.add(ClientCommunication.processCommand(
                     message.substring(1)));
         } else {
-            String temp = "[ADMIN]: " + message;
-            chatHist.add(temp);
-            ClientCommunication.distributeMessage(temp);
+            chatHist.add("[ADMIN]: " + message);
+            ClientCommunication.distributeMessage(message);
         }
         updateChat();
-    }
-    
-    /**
-     * Activated when the admin double clicks a user on the list
-     * @param lse the ListSelectionEvent that is generated
-     */
-    private void playerSelected(ListSelectionEvent lse) {
-        // textField.setText(textField.getText() + playerList.getSelectedValue());
     }
     
     /**
@@ -126,7 +116,6 @@ public class ServerUI extends JFrame {
      */
     private void playerSelected(MouseEvent me) {
         int idx = playerList.locationToIndex(me.getPoint());
-        System.out.println(":" + idx);
         String selected = playerLModel.get(idx);
         if(selected != null) 
             textField.setText(textField.getText() + selected);
