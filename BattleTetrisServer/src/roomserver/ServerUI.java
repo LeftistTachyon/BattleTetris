@@ -19,7 +19,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
-import javax.swing.event.ListSelectionEvent;
 
 public class ServerUI extends JFrame {
     
@@ -48,6 +47,7 @@ public class ServerUI extends JFrame {
         setTitle("Server UI");
 
         chatPane.setEditable(false);
+        chatPane.setContentType("text/html");
         chatSP.setViewportView(chatPane);
 
         textField.setFont(new Font("Segoe UI", 0, 11)); // NOI18N
@@ -125,11 +125,11 @@ public class ServerUI extends JFrame {
      * Updates the chat according to the contents of {@code chatHist}.
      */
     private void updateChat() {
-        String toSet = "<html>";
+        String toSet = "<html><p style=\"font-family:Consolas\">";
         for(String line : chatHist) {
             toSet += line + "<br>";
         }
-        chatPane.setText(toSet + "</html>");
+        chatPane.setText(toSet + "</p></html>");
     }
     
     /**
@@ -180,7 +180,6 @@ public class ServerUI extends JFrame {
         ServerUI output = new ServerUI();
         EventQueue.invokeLater(() -> {
             output.setVisible(true);
-            output.updateChat();
         });
         return output;
     }
@@ -191,7 +190,7 @@ public class ServerUI extends JFrame {
     private JScrollPane listSP;
     
     private JScrollPane chatSP;
-    private JEditorPane chatPane;
+    private JTextPane chatPane;
     private LinkedList<String> chatHist;
     
     private JTextField textField;
