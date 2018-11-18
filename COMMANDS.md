@@ -10,3 +10,5 @@ The "body" of the command is what follows the first word of the command.
 |`/ban-ip`                |`<address\|name> [reason...]`|Adds an IP to the blacklist.                   |
 |`/banlist`               |`ips\|players`               |Displays the server's blacklist.               |
 |`/w` or `/tell` or `/msg`|`<player> <message...>`      |Sends a private message to one or more players.|
+|`/pardon`                |`<player>`                   |Removes a player from the blacklist.           |
+|`/pardon-ip`             |`<address>`                  |Removes an IP from the blacklist.              |
