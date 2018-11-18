@@ -1,5 +1,5 @@
 # Admin commands  
-The following table lists out all admin commands. The basis of these commands heavily relies on the Minecraft command system.  
+The following table lists out all admin commands. Much of the commands are copies from the Minecraft command system.  
 The "body" of the command is what follows the first word of the command.  
   
 |Command                  |Body                                                    |What it does                                   |
