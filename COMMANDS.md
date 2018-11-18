@@ -13,3 +13,4 @@ The "body" of the command is what follows the first word of the command.
 |`/pardon`                |<code><<i>player</i>></code>                            |Removes a player from the blacklist.           |
 |`/pardon-ip`             |<code><<i>address</i>></code>                           |Removes an IP from the blacklist.              |
 |`/stop`                  |none                                                    |Stops the server.                              |
+|`/list`                  |none                                                    |Lists all players on the server.               |
