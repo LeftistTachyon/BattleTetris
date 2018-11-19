@@ -5,10 +5,8 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.LinkedList;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
-import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
@@ -22,7 +20,7 @@ import javax.swing.WindowConstants;
 
 public class ServerUI extends JFrame {
     
-    /** Creates new form Antenna */
+    /** Creates new form ServerUI */
     public ServerUI() {
         initComponents();
     }
@@ -41,12 +39,13 @@ public class ServerUI extends JFrame {
         chatPane = new JTextPane();
         textField = new JTextField();
         playerLModel = new DefaultListModel<>();
-        chatHist = new LinkedList<>();
+        chatHist = "";
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Server UI");
 
         chatPane.setEditable(false);
+        chatPane.setFont(new Font("Consolas", Font.PLAIN, 15));
         chatPane.setContentType("text/html");
         chatSP.setViewportView(chatPane);
 
@@ -63,30 +62,30 @@ public class ServerUI extends JFrame {
             }
         });
         listSP.setViewportView(playerList);
-
+        
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(listSP, GroupLayout.PREFERRED_SIZE, 100, GroupLayout.PREFERRED_SIZE)
+                .addComponent(listSP, GroupLayout.PREFERRED_SIZE, 146, GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(chatSP, GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE)
-                    .addComponent(textField))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(chatSP)
+                    .addComponent(textField, GroupLayout.DEFAULT_SIZE, 481, Short.MAX_VALUE))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(listSP, GroupLayout.DEFAULT_SIZE, 326, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(chatSP)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(listSP, GroupLayout.DEFAULT_SIZE, 303, Short.MAX_VALUE))
+                        .addComponent(textField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -99,14 +98,16 @@ public class ServerUI extends JFrame {
      */
     private void sendMessage(ActionEvent evt) {                                            
         String message = textField.getText();
+        if(message.equals("")) return;
         textField.setText("");
-        if(message.startsWith("/")) {
-            chatHist.add(ClientCommunication.processCommand(
-                    message.substring(1)));
+        if(message.startsWith("/") && !"/".equals(message)) {
+            chatHist += ClientCommunication.processCommand(
+                    message.substring(1));
         } else {
-            chatHist.add("[ADMIN]: " + message);
+            chatHist += "[ADMIN]: " + message;
             ClientCommunication.distributeMessage(message);
         }
+        chatHist += "<br>";
         updateChat();
     }
     
@@ -115,21 +116,20 @@ public class ServerUI extends JFrame {
      * @param me the MouseEvent that is generated
      */
     private void playerSelected(MouseEvent me) {
-        int idx = playerList.locationToIndex(me.getPoint());
-        String selected = playerLModel.get(idx);
-        if(selected != null) 
-            textField.setText(textField.getText() + selected);
+        if(me.getClickCount() == 2) {
+            int idx = playerList.locationToIndex(me.getPoint());
+            String selected = playerLModel.get(idx);
+            if (selected != null) {
+                textField.setText(textField.getText() + selected);
+            }
+        }
     }
     
     /**
      * Updates the chat according to the contents of {@code chatHist}.
      */
     private void updateChat() {
-        String toSet = "<html><p style=\"font-family:Consolas\">";
-        for(String line : chatHist) {
-            toSet += line + "<br>";
-        }
-        chatPane.setText(toSet + "</p></html>");
+        chatPane.setText("<html><pre>" + chatHist + "</pre></html>");
     }
     
     /**
@@ -191,7 +191,7 @@ public class ServerUI extends JFrame {
     
     private JScrollPane chatSP;
     private JTextPane chatPane;
-    private LinkedList<String> chatHist;
+    private String chatHist;
     
     private JTextField textField;
     //</editor-fold>

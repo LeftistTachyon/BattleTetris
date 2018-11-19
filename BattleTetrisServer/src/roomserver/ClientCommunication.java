@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.TreeMap;
 
 /**
  * A class that handles communication with clients
@@ -337,13 +338,201 @@ public class ClientCommunication {
     }
     
     /**
+     * The String that is displayed when an unknown command is entered.
+     */
+    private static final String UNKNOWN_COMMAND = 
+            "<span style=\"color:red;\">Unknown command. Try /help for a list "
+            + "of commands</span>";
+    
+    /**
+     * The String that is displayed when a method is called with an 
+     * incorrect amount of arguments.
+     * e.g. {@code nothing()} is called when the method signature is 
+     * <code>public void nothing(int i){...}</code>
+     */
+    private static final String BAD_METHOD_CALL_1 = "<span style=\"color:red;\">"
+            + "Bad command: actual and formal arguments differ in length.</span>";
+    
+    private static final String BAD_METHOD_CALL_2 = "<span style=\"color:red;\">" 
+            + "Bad command: incorrect argument type";
+    /**
+     * A TreeMap that stores all method stubs.
+     */
+    private static final TreeMap<String, String> COMMAND_TXT = new TreeMap<>();
+    
+    static {
+        COMMAND_TXT.put("help", "/help [<i>page</i>|<i>command</i>]");
+        COMMAND_TXT.put("?", "/? [<i>page</i>|<i>command</i>]");
+        COMMAND_TXT.put("kick", "/kick &lt;<i>player</i>> [<i>reason</i>...]");
+        COMMAND_TXT.put("ban", "/ban &lt;<i>player</i>> [<i>reason</i>...]");
+        COMMAND_TXT.put("ban-ip", 
+                "/ban-ip &lt;<i>address</i>|<i>player</i>> [<i>reason</i>...]");
+        COMMAND_TXT.put("w", "/w &lt;<i>player</i>> &lt;<i>message</i>...>");
+        COMMAND_TXT.put("tell", "/tell &lt;<i>player</i>> &lt;<i>message</i>...>");
+        COMMAND_TXT.put("msg", "/msg &lt;<i>player</i>> &lt;<i>message</i>...>");
+        COMMAND_TXT.put("banlist", "/banlist <ips|players>");
+        COMMAND_TXT.put("pardon", "/pardon &lt;<i>player</i>>");
+        COMMAND_TXT.put("pardon-ip", "/pardon-ip &lt;<i>address</i>>");
+        COMMAND_TXT.put("stop", "/stop");
+        COMMAND_TXT.put("list", "/list");
+        COMMAND_TXT.put("setmaxplayers", "/setmaxplayers &lt;<i>maxPlayers: int</i>|clear>");
+    }
+    
+    /**
      * Processes a command from the admin.
      * @param command the command to process; 
      * in the format <code>[body] [stuff]...</code>.
      * @return the message to print out for the admin's console
      */
     public static String processCommand(String command) {
-        return "";
+        String[] data = command.split(" ");
+        switch(data[0]) {
+            case "help":
+            case "?":
+                int page;
+                if(data.length == 2) {
+                    try {
+                        page = Integer.parseInt(data[1]);
+                    } catch (NumberFormatException nfe) {
+                        page = -1;
+                    }
+                } else {
+                    page = 1;
+                }
+                if(page == -1) {
+                    return getHelp(data[1]);
+                } else {
+                    return getHelpPage(page);
+                }
+            case "kick":
+                switch (data.length) {
+                    case 2:
+                        String player2 = data[1];
+                        break;
+                    case 3:
+                        String player3 = data[1], reason = "";
+                        for(int i = 2; i < data.length; i++) {
+                            reason += data[i];
+                        }
+                        break;
+                    default:
+                        return BAD_METHOD_CALL_1;
+                }
+            case "ban":
+                switch (data.length) {
+                    case 2:
+                        String player2 = data[1];
+                        break;
+                    case 3:
+                        String player3 = data[1], reason = "";
+                        for(int i = 2; i < data.length; i++) {
+                            reason += data[i];
+                        }
+                        break;
+                    default:
+                        return BAD_METHOD_CALL_1;
+                }
+            case "ban-ip":
+                switch (data.length) {
+                    case 2:
+                        String thing2 = data[1];
+                        break;
+                    case 3:
+                        String thing3 = data[1], reason = "";
+                        for(int i = 2; i < data.length; i++) {
+                            reason += data[i];
+                        }
+                        break;
+                    default:
+                        return BAD_METHOD_CALL_1;
+                }
+            case "banlist":
+                if(data.length == 2) {
+                    switch(data[1]) {
+                        case "ips":
+                            break;
+                        case "players":
+                            break;
+                        default:
+                            return BAD_METHOD_CALL_2;
+                    }
+                } else return BAD_METHOD_CALL_1;
+            default:
+                return UNKNOWN_COMMAND;
+        }
+    }
+    
+    /**
+     * Returns the help for a command
+     * @param command the command to look up help for
+     * @return the help documentation
+     */
+    private static String getHelp(String command) {
+        String output = "<span style=\"color:blue\";>" + 
+                COMMAND_TXT.get(command) + "</span><br>";
+        switch(command) {
+            case "help":
+            case "?":
+                output += "Provides help/list of commands.";
+                break;
+            case "kick":
+                output += "Kicks a player off a server.";
+                break;
+            case "ban":
+                output += "Adds a player to the blacklist.";
+                break;
+            case "ban-ip":
+                output += "Adds an IP to the blacklist.";
+                break;
+            case "banlist":
+                output += "Displays the server\'s blacklist";
+                break;
+            case "w":
+            case "tell":
+            case "msg":
+                output += "Sends a private message to one or more players.";
+                break;
+            case "pardon":
+                output += "Removes a player from the blacklist.";
+                break;
+            case "pardon-ip":
+                output += "Removes an IP from the blacklist.";
+                break;
+            case "stop":
+                output += "Stops the server.";
+                break;
+            case "list":
+                output += "Lists all players on the server.";
+                break;
+            case "setmaxplayers":
+                output += "Sets the maximum number of players allowed to join.";
+                break;
+            default:
+                return UNKNOWN_COMMAND;
+        }
+        return output;
+    }
+    
+    /**
+     * Returns the help page of that number
+     * @param page the page number
+     * @return the help page
+     */
+    private static String getHelpPage(int page) {
+        int start = page*5-5, size = COMMAND_TXT.size();
+        if(start >= size || start < 0)
+            return "<span style=\"color:red;\">There is no page " + page + 
+                    "</span>";
+        String output = "<span style = \"color:green;\">--- Showing help page " 
+                + page + " of " + ((int) Math.ceil(size/5.0)) + 
+                " (/help &lt;page>) ---</span><br>";
+        for(int i = start; i < start+5; i++) {
+            if(i >= size) break;
+            String key = (String) COMMAND_TXT.keySet().toArray()[i];
+            output += COMMAND_TXT.get(key);
+            if(i != start - 4 || i != size - 1) output += "<br>";
+        }
+        return output;
     }
     
     /**
