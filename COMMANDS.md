@@ -4,7 +4,7 @@ The "body" of the command is what follows the first word of the command.
   
 |Command                  |Body                                                    |What it does                                       |
 |:-----------------------:|:------------------------------------------------------:|:-------------------------------------------------:|
-|`/help` or `/?`          |`[page\|command]`                                       |Provides help/list of commands.                    |
+|`/help` or `/?`          |<code>[<i>page</i>\|<i>command</i>]</code>              |Provides help/list of commands.                    |
 |`/kick`                  |<code><<i>player</i>> [<i>reason</i>...]</code>         |Kicks a player off a server.                       |
 |`/ban`                   |<code><<i>player</i>> [<i>reason</i>...]</code>         |Adds a player to the blacklist.                    |
 |`/ban-ip`                |<code><<i>address\|player</i>> [<i>reason</i>...]</code>|Adds an IP to the blacklist.                       |
