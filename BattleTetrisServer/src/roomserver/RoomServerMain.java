@@ -20,9 +20,6 @@ public class RoomServerMain {
         
         ClientCommunication.startServerUI();
         
-        /*MainWindow mw = new MainWindow();
-        Handler.setMainWindow(mw);*/
-        
         try(ServerSocket listener = new ServerSocket(ClientCommunication.PORT)) {
             while(true) {
                 Handler h = new Handler(listener.accept());

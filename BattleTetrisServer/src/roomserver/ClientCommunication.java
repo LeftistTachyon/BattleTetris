@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -160,7 +161,13 @@ public class ClientCommunication {
                 // Accept messages from this client and broadcast them.
                 // Ignore other clients that cannot be broadcasted to.
                 while(true) {
-                    String line = in.readLine();
+                    String line = null;
+                    try {
+                        line = in.readLine();
+                    } catch (SocketException se) {
+                        serverUI.chatOut.println("<span style=\"color:blue;\">"+
+                                name + " disconnected.</span>");
+                    }
                     // notify(line, true);
                     if(line == null) {
                         return;
@@ -176,6 +183,7 @@ public class ClientCommunication {
                         for(Handler h : HANDLERS.values()) {
                             h.out.println(message);
                         }
+                        serverUI.chatOut.println(message.substring(3));
                     } else if(inGame) {
                         if(line.equals("EXIT")) {
                             inGame = false;
@@ -269,7 +277,9 @@ public class ClientCommunication {
                     }
                 }
             } catch(IOException e) {
-                println(e.toString());
+                serverUI.chatOut.print("<span style=\"color:rgb(128,0,0);\">");
+                e.printStackTrace(serverUI.chatOut);
+                serverUI.chatOut.print("</span>");
             } finally {
                 // This client is going down!  Remove its name and its print
                 // writer from the sets, and close its socket.
@@ -346,15 +356,37 @@ public class ClientCommunication {
     
     /**
      * The String that is displayed when a method is called with an 
-     * incorrect amount of arguments.
+     * incorrect amount of arguments.<br>
      * e.g. {@code nothing()} is called when the method signature is 
      * <code>public void nothing(int i){...}</code>
      */
     private static final String BAD_METHOD_CALL_1 = "<span style=\"color:red;\">"
             + "Bad command: actual and formal arguments differ in length.</span>";
     
+    /**
+     * The String that is displayed when a method is called with an incorrect
+     * argument type.<br>
+     * e.g. {@code nothing("Help")} is called when the method signature is 
+     * <code>public void nothing(int i){...}</code>
+     */
     private static final String BAD_METHOD_CALL_2 = "<span style=\"color:red;\">" 
-            + "Bad command: incorrect argument type";
+            + "Bad command: incorrect argument type</span>";
+    
+    /**
+     * The String that is displayed when a method is called with a wrong 
+     * value.<br>
+     * In essence, this is a {@code IllegalArgumentException}.
+     */
+    private static final String BAD_METHOD_CALL_3 = "<span style=\"color:red;\">"
+            + "Bad command: unexpected argument value</span>";
+    
+    /**
+     * The String that is displayed when a username that doesn't match 
+     * any player is used as an argument to a method.
+     */
+    private static final String UNKNOWN_PLAYER = "<span style=\"color:red;\">"
+            + "Unknown player: no player with that name is connected</span>";
+    
     /**
      * A TreeMap that stores all method stubs.
      */
@@ -405,47 +437,46 @@ public class ClientCommunication {
                     return getHelpPage(page);
                 }
             case "kick":
-                switch (data.length) {
-                    case 2:
-                        String player2 = data[1];
-                        break;
-                    case 3:
-                        String player3 = data[1], reason = "";
-                        for(int i = 2; i < data.length; i++) {
-                            reason += data[i];
-                        }
-                        break;
-                    default:
-                        return BAD_METHOD_CALL_1;
-                }
+                if(data.length == 2) {
+                    String player2 = data[1];
+                    if(!HANDLERS.containsKey(player2)) {
+                        return UNKNOWN_PLAYER;
+                    }
+                    Handler toSend = HANDLERS.get(player2);
+                    toSend.out.println("KICK");
+                    return "<span style=\"color:green;\">Sucessfully kicked " 
+                            + player2 + ".</span>";
+                } else if(data.length > 2) {
+                    String player = data[1], reason = "";
+                    if(!HANDLERS.containsKey(player)) {
+                        return UNKNOWN_PLAYER;
+                    }
+                    for(int i = 2; i < data.length; i++) {
+                        reason += data[i] + " ";
+                    }
+                    Handler toSend = HANDLERS.get(player);
+                    toSend.out.println("KICK" + reason.trim());
+                    return "<span style=\"color:green;\">Sucessfully kicked " 
+                            + player + ".</span>";
+                } else return BAD_METHOD_CALL_1;
             case "ban":
-                switch (data.length) {
-                    case 2:
-                        String player2 = data[1];
-                        break;
-                    case 3:
-                        String player3 = data[1], reason = "";
-                        for(int i = 2; i < data.length; i++) {
-                            reason += data[i];
-                        }
-                        break;
-                    default:
-                        return BAD_METHOD_CALL_1;
-                }
+                if(data.length == 2) {
+                    String player2 = data[1];
+                } else if(data.length > 2) {
+                    String player = data[1], reason = "";
+                    for(int i = 2; i < data.length; i++) {
+                        reason += data[i] + " ";
+                    }
+                } else return BAD_METHOD_CALL_1;
             case "ban-ip":
-                switch (data.length) {
-                    case 2:
-                        String thing2 = data[1];
-                        break;
-                    case 3:
-                        String thing3 = data[1], reason = "";
-                        for(int i = 2; i < data.length; i++) {
-                            reason += data[i];
-                        }
-                        break;
-                    default:
-                        return BAD_METHOD_CALL_1;
-                }
+                if(data.length == 2) {
+                    String thing2 = data[1];
+                } else if(data.length > 2) {
+                    String thing = data[1], reason = "";
+                    for(int i = 2; i < data.length; i++) {
+                        reason += data[i] + " ";
+                    }
+                } else return BAD_METHOD_CALL_1;
             case "banlist":
                 if(data.length == 2) {
                     switch(data[1]) {
@@ -454,12 +485,66 @@ public class ClientCommunication {
                         case "players":
                             break;
                         default:
-                            return BAD_METHOD_CALL_2;
+                            return BAD_METHOD_CALL_3;
+                    }
+                } else return BAD_METHOD_CALL_1;
+            case "w":
+            case "tell":
+            case "msg":
+                if(data.length > 2) {
+                    String player = data[1]; 
+                    if(!HANDLERS.containsKey(player)) {
+                        return UNKNOWN_PLAYER;
+                    }
+                    String message = "";
+                    for(int i = 2; i < data.length; i++) {
+                        message += data[i] + " ";
+                    }
+                    Handler toSend = HANDLERS.get(player);
+                    toSend.out.println("NLM[ADMIN] whispered to you: " + message);
+                    return "You whispered to " + player + ": " + message;
+                } else return BAD_METHOD_CALL_1;
+            case "pardon":
+                if(data.length == 2) {
+                    String player = data[1];
+                } else return BAD_METHOD_CALL_1;
+            case "pardon-ip":
+                if(data.length == 2) {
+                    String ip = data[1];
+                } else return BAD_METHOD_CALL_1;
+            case "stop":
+                System.exit(0);
+                break;
+            case "list":
+                if(HANDLERS.isEmpty())
+                    return "<span style=\"color:green;\">There are no players connected.</span>";
+                String output = "<span style=\"color:green;\">All connected players:</span><br>";
+                for(String name : HANDLERS.keySet()) {
+                    output += name + "<br>";
+                }
+                return output;
+            case "setmaxplayers":
+                if(data.length == 2) {
+                    String num = data[1];
+                    try {
+                        int max = Integer.parseInt(num);
+                    } catch (NumberFormatException nfe) {
+                        if(num.equals("clear")) {
+                            
+                        } else return BAD_METHOD_CALL_3;
                     }
                 } else return BAD_METHOD_CALL_1;
             default:
                 return UNKNOWN_COMMAND;
         }
+        try {
+            throw new Exception("How did we get here?");
+        } catch (Exception e) {
+            serverUI.chatOut.print("<span style=\"color:rgb(128,0,0);\">");
+            e.printStackTrace(serverUI.chatOut);
+            serverUI.chatOut.println("</span>");
+        }
+        return null;
     }
     
     /**
@@ -468,7 +553,7 @@ public class ClientCommunication {
      * @return the help documentation
      */
     private static String getHelp(String command) {
-        String output = "<span style=\"color:blue\";>" + 
+        String output = "<span style=\"color:blue;\">" + 
                 COMMAND_TXT.get(command) + "</span><br>";
         switch(command) {
             case "help":
@@ -530,7 +615,7 @@ public class ClientCommunication {
             if(i >= size) break;
             String key = (String) COMMAND_TXT.keySet().toArray()[i];
             output += COMMAND_TXT.get(key);
-            if(i != start - 4 || i != size - 1) output += "<br>";
+            if(i != start + 4 && i != size - 1) output += "<br>";
         }
         return output;
     }

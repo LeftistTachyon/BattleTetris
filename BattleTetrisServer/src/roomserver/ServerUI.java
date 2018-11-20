@@ -5,6 +5,11 @@ import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.Enumeration;
+import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
 import javax.swing.JFrame;
@@ -14,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.LayoutStyle;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
@@ -23,6 +29,7 @@ public class ServerUI extends JFrame {
     /** Creates new form ServerUI */
     public ServerUI() {
         initComponents();
+        chatOut = new PrintStream(new ChatOutputStream());
     }
     
     /** This method is called from within the constructor to
@@ -101,13 +108,13 @@ public class ServerUI extends JFrame {
         if(message.equals("")) return;
         textField.setText("");
         if(message.startsWith("/") && !"/".equals(message)) {
-            chatHist += ClientCommunication.processCommand(
+            chatHist = chatHist.trim() +  ClientCommunication.processCommand(
                     message.substring(1));
         } else {
-            chatHist += "[ADMIN]: " + message;
+            chatHist = chatHist.trim() +  "[ADMIN]: " + message;
             ClientCommunication.distributeMessage(message);
         }
-        chatHist += "<br>";
+        chatHist = chatHist.trim() +  "<br>";
         updateChat();
     }
     
@@ -192,7 +199,67 @@ public class ServerUI extends JFrame {
     private JScrollPane chatSP;
     private JTextPane chatPane;
     private String chatHist;
+    public final PrintStream chatOut;
     
     private JTextField textField;
     //</editor-fold>
+    
+    /**
+     * An implementation of an OutputStream that writes to the chat 
+     * {@code JTextPane}.
+     * Shoutouts to <pre>Hovercraft Full of Eels</pre> 
+     * for this code!
+     */
+    public class ChatOutputStream extends OutputStream {
+        /**
+         * The String that builds the line of text.
+         */
+        private String s;
+
+        /**
+         * Creates a new ChatOutputStream.
+         */
+        public ChatOutputStream() {
+            s = "";
+        }
+
+        @Override
+        public void flush() throws IOException {
+            super.flush();
+        }
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+        }
+        
+        @Override
+        public void write(int b) throws IOException {
+            if(b == '\r') return;
+            
+            if(b == '\n') {
+                final String toAdd = s + "<br>";
+                SwingUtilities.invokeLater(() -> {
+                    chatHist = chatHist.trim() +  toAdd;
+                    updateChat();
+                });
+                s = "";
+                
+                return;
+            }
+            
+            s += ((char)b);
+        }
+    }
+    
+    /**
+     * Prints out the entire log.
+     */
+    public void printLog() {
+        System.err.println("log:");
+        String[] data = chatHist.split(Pattern.quote("<br>"));
+        for(String s : data) {
+            System.out.println(s);
+        }
+    }
 }

@@ -15,6 +15,11 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.HashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import javafx.concurrent.ScheduledService;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import simpletetris.AudioPlayer;
 import simpletetris.TetrisBag;
@@ -158,6 +163,46 @@ public class ServerCommunication {
                 status.put(line.substring(4), false);
             } else if(line.startsWith("NLM")) {
                 lw.addLobbyMessage(line.substring(3));
+            } else if(line.startsWith("KICK")) {
+                String reason = line.substring(4);
+                JFrame active = (tFrame == null)?lw:tFrame;
+                active.requestFocus();
+                Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+                    System.exit(0);
+                }, 5000, TimeUnit.MILLISECONDS);
+                if("".equals(reason)) {
+                    // no reason
+                    JOptionPane.showMessageDialog(active, 
+                            "You\'ve been kicked from the server.", 
+                            "You\'ve been kicked", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // reason
+                    JOptionPane.showMessageDialog(active, 
+                            "You\'ve been kicked from the server.\n"
+                                    + "Reason: " + reason, 
+                            "You\'ve been kicked", JOptionPane.ERROR_MESSAGE);
+                }
+                System.exit(0);
+            } else if(line.startsWith("BAN")) {
+                String reason = line.substring(3);
+                JFrame active = (tFrame == null)?lw:tFrame;
+                active.requestFocus();
+                Executors.newSingleThreadScheduledExecutor().schedule(() -> {
+                    System.exit(0);
+                }, 5000, TimeUnit.MILLISECONDS);
+                if("".equals(reason)) {
+                    // no reason
+                    JOptionPane.showMessageDialog(active, 
+                            "You\'ve been banned from the server.", 
+                            "You\'ve been banned", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    // reason
+                    JOptionPane.showMessageDialog(active, 
+                            "You\'ve been banned from the server.\n"
+                                    + "Reason: " + reason, 
+                            "You\'ve been banned", JOptionPane.ERROR_MESSAGE);
+                }
+                System.exit(0);
             } else {
                 if(inGame) {
                     if(line.equals("EXIT")) {
