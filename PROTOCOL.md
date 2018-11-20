@@ -20,6 +20,8 @@ This protocol table is for communication between the client and the server.
 |`CHALLENGE_R` (challenge response)  |Client to Server|`[String challenger] [boolean accepted]`|None, but pairs the two if they accept  |
 |`CHALLENGE_C` (relaying a challenge)|Server to Client|`[String challenger]`                   |Whether the client accepts the challenge|
 |`CHALLENGE_R` (relaying the reponse)|Server to Client|`[boolean accepted]`                    |(none)                                  |
+|`KICK`                              |Server to Client|`<String reason>` (reason is optional)  |None, but kicks the player off of the server|
+|`BAN`                               |Server to Client|`<String reason>` (reason is optional)  |None, but kicks the player off of the server and informs the player that they have been banned from the server.|
 
 ## In-Game Command table  
 This protocol table is for communication between clients in-game (for Tetris).  
