@@ -8,7 +8,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Enumeration;
 import java.util.regex.Pattern;
 import javax.swing.DefaultListModel;
 import javax.swing.GroupLayout;
@@ -24,6 +23,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.WindowConstants;
 
+/**
+ * The GUI for the server.
+ * @author Jed Wang
+ */
 public class ServerUI extends JFrame {
     
     /** Creates new form ServerUI */
@@ -192,15 +195,42 @@ public class ServerUI extends JFrame {
     }
     
     //<editor-fold defaultstate="collapsed" desc="Variables declaration - do not modify">
+    /**
+     * A JList that contains all players except for this player.
+     */
     private JList<String> playerList;
+    
+    /**
+     * The ListModel for {@code playerList}.
+     */
     private DefaultListModel<String> playerLModel;
+    
+    /**
+     * The {@code JScrollPane} that conatins {@code playerList}.
+     */
     private JScrollPane listSP;
     
+    /**
+     * The {@code JScrollPane} that conatins {@code chatPane}.
+     */
     private JScrollPane chatSP;
+    /**
+     * The {@code JTextPane} that conatins the chat history.
+     */
     private JTextPane chatPane;
+    /**
+     * The chat history.
+     */
     private String chatHist;
+    /**
+     * A PrintStream that prints directly into {@code chatPane}.<br>
+     * NOTE: use {@code .println()} to print <code>&lt;span></code> tags.
+     */
     public final PrintStream chatOut;
     
+    /**
+     * The {@code JTextField} used for user input.
+     */
     private JTextField textField;
     //</editor-fold>
     
