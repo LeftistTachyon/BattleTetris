@@ -104,6 +104,7 @@ public class ServerCommunication {
                 socket = new Socket(serverAddress, 9001);
             } catch (ConnectException | NoRouteToHostException | UnknownHostException ex) {
                 Object[] options = {"Reenter IP Adress", "Exit"};
+                Toolkit.getDefaultToolkit().beep();
                 int returned = JOptionPane.showOptionDialog(lw, ex.getMessage(), 
                         "Connection Error", JOptionPane.OK_CANCEL_OPTION, 
                         JOptionPane.ERROR_MESSAGE, null, options, options[0]);
@@ -130,6 +131,7 @@ public class ServerCommunication {
             try {
                 line = in.readLine();
             } catch (SocketException se) {
+                Toolkit.getDefaultToolkit().beep();
                 JOptionPane.showMessageDialog(lw, 
                         "You have been disconnected from the server.", 
                         "Disconnected", JOptionPane.WARNING_MESSAGE);
@@ -172,11 +174,13 @@ public class ServerCommunication {
                 }, 5000, TimeUnit.MILLISECONDS);
                 if("".equals(reason)) {
                     // no reason
+                    Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(active, 
                             "You\'ve been kicked from the server.", 
                             "You\'ve been kicked", JOptionPane.ERROR_MESSAGE);
                 } else {
                     // reason
+                    Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(active, 
                             "You\'ve been kicked from the server.\n"
                                     + "Reason: " + reason, 
@@ -192,11 +196,13 @@ public class ServerCommunication {
                 }, 5000, TimeUnit.MILLISECONDS);
                 if("".equals(reason)) {
                     // no reason
+                    Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(active, 
                             "You\'ve been banned from the server.", 
                             "You\'ve been banned", JOptionPane.ERROR_MESSAGE);
                 } else {
                     // reason
+                    Toolkit.getDefaultToolkit().beep();
                     JOptionPane.showMessageDialog(active, 
                             "You\'ve been banned from the server.\n"
                                     + "Reason: " + reason, 
@@ -210,6 +216,7 @@ public class ServerCommunication {
                                 + "the match.");
                         inGame = false;
                         if(tFrame != null) {
+                            Toolkit.getDefaultToolkit().beep();
                             JOptionPane.showMessageDialog(tFrame, 
                                     "The other person has left the match.", 
                                     "Disconnected", JOptionPane.PLAIN_MESSAGE);
@@ -285,6 +292,7 @@ public class ServerCommunication {
                         // init stuff
                     } else if(line.startsWith("CHALLENGE_C")) {
                         // I'm being challenged!
+                        Toolkit.getDefaultToolkit().beep();
                         String challenger = line.substring(11);
                         int choice = JOptionPane.showConfirmDialog(lw,
                                 challenger + " has challenged you!\nDo you accept?",

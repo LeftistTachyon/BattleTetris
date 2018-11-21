@@ -292,4 +292,14 @@ public class ServerUI extends JFrame {
             System.out.println(s);
         }
     }
+    
+    /**
+     * Prints the stack trace of an Exception that was thrown
+     * @param e the Exception to print the stack trace of
+     */
+    public void printStackTrace(Exception e) {
+        chatOut.print("<span style=\"color:rgb(128,0,0);\">");
+        e.printStackTrace(chatOut);
+        chatOut.println("</span>");
+    }
 }

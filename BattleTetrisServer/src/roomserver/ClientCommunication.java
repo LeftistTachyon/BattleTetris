@@ -15,8 +15,6 @@ import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A class that handles communication with clients
@@ -46,20 +44,30 @@ public class ClientCommunication {
     /**
      * A Set of banned names.
      */
-    private static final Set<String> BANNED_NAMES = new HashSet<>();
+    private static final HashMap<String, String> BANNED_NAMES = new HashMap<>();
     
     /**
      * A Set of banned IP addresses.
      */
-    private static final Set<InetAddress> BANNED_IPS = new HashSet<>();
+    private static final HashMap<InetAddress, String> BANNED_IPS = new HashMap<>();
+    
+    /**
+     * The maximum amount of players allowed on the server.
+     * {@code -1} means any amount is fine.
+     */
+    private static int max_players = -1;
     
     /**
      * Starts the serverUI.
      */
     public static void startServerUI() {
-        serverUI = new ServerUI();
-        serverUI.setVisible(true); /*Stopgap*/
+        serverUI = ServerUI.run();
     }
+    
+    /**
+     * No instantiation for you!
+     */
+    private ClientCommunication() {}
     
     /**
      * A handler thread class.  Handlers are spawned from the listening
@@ -138,6 +146,19 @@ public class ClientCommunication {
                 in = new BufferedReader(new InputStreamReader(
                     socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
+                
+                // Check if this IP is banned
+                InetAddress thisAdd = socket.getInetAddress();
+                if(BANNED_IPS.containsKey(thisAdd)) {
+                    String reason = BANNED_IPS.get(thisAdd);
+                    if(reason == null) {
+                        out.println("BAN");
+                    } else {
+                        out.println("BAN" + reason);
+                    }
+                    close();
+                    return;
+                }
 
                 // Request a name from this client.  Keep requesting until
                 // a name is submitted that is not already used.  Note that
@@ -164,6 +185,18 @@ public class ClientCommunication {
                             break;
                         }
                     }
+                }
+                
+                // Check if this name/user is banned
+                if(BANNED_NAMES.containsKey(name)) {
+                    String reason = BANNED_NAMES.get(name);
+                    if(reason == null) {
+                        out.println("BAN");
+                    } else {
+                        out.println("BAN" + reason);
+                    }
+                    close();
+                    return;
                 }
                 
                 // Now that a successful name has been chosen, add the
@@ -291,32 +324,40 @@ public class ClientCommunication {
                     }
                 }
             } catch(IOException e) {
-                serverUI.chatOut.print("<span style=\"color:rgb(128,0,0);\">");
-                e.printStackTrace(serverUI.chatOut);
-                serverUI.chatOut.print("</span>");
+                serverUI.printStackTrace(e);
             } finally {
-                // This client is going down!  Remove its name and its print
-                // writer from the sets, and close its socket.
-                for(Handler h : HANDLERS.values()) {
-                    h.out.println("REMOVECLIENT" + name);
-                }
-                if(opponent != null) {
-                    opponent.out.println("EXIT");
-                    opponent.inGame = false;
-                    for(Handler h : HANDLERS.values()) {
-                        h.out.println("FREE" + opponent.name);
-                    }
-                }
-                if(HANDLERS != null) {
-                    HANDLERS.remove(name);
-                    serverUI.removePlayer(name);
-                }
-                out.close();
                 try {
-                    in.close();
-                    socket.close();
-                } catch(IOException e) {}
+                    // This client is going down!  Remove its name and its print
+                    // writer from the sets, and close its socket.
+                    close();
+                } catch (IOException ex) {
+                    ex.printStackTrace(serverUI.chatOut);
+                }
             }
+        }
+        
+        /**
+         * Fully disposes this Handler
+         * @throws IOException if something goes wrong
+         */
+        private void close() throws IOException {
+            for(Handler h : HANDLERS.values()) {
+                h.out.println("REMOVECLIENT" + name);
+            }
+            if(opponent != null) {
+                opponent.out.println("EXIT");
+                opponent.inGame = false;
+                for(Handler h : HANDLERS.values()) {
+                    h.out.println("FREE" + opponent.name);
+                }
+            }
+            if(HANDLERS != null) {
+                HANDLERS.remove(name);
+                serverUI.removePlayer(name);
+            }
+            out.close();
+            in.close();
+            socket.close();
         }
         
         /**
@@ -366,7 +407,7 @@ public class ClientCommunication {
      */
     private static final String UNKNOWN_COMMAND = 
             "<span style=\"color:red;\">Unknown command. Try /help for a list "
-            + "of commands</span>";
+            + "of commands.</span>";
     
     /**
      * The String that is displayed when a method is called with an 
@@ -384,7 +425,7 @@ public class ClientCommunication {
      * <code>public void nothing(int i){...}</code>
      */
     private static final String BAD_METHOD_CALL_2 = "<span style=\"color:red;\">" 
-            + "Bad command: incorrect argument type</span>";
+            + "Bad command: incorrect argument type.</span>";
     
     /**
      * The String that is displayed when a method is called with a wrong 
@@ -392,55 +433,55 @@ public class ClientCommunication {
      * In essence, this is a {@code IllegalArgumentException}.
      */
     private static final String BAD_METHOD_CALL_3 = "<span style=\"color:red;\">"
-            + "Bad command: unexpected argument value</span>";
+            + "Bad command: unexpected argument value.</span>";
     
     /**
      * The String that is displayed when the admin attempts to ban a 
      * user that has already been placed on the blacklist. 
      */
     private static final String ALREADY_BANNED_U = "<span style=\"color:red;\">"
-            + "That user has already been banned</span>";
+            + "That user has already been banned.</span>";
     
     /**
      * The String that is displayed when the admin attempts to ban a 
      * name that has already been placed on the blacklist. 
      */
     private static final String ALREADY_BANNED_N = "<span style=\"color:red;\">"
-            + "That name has already been banned</span>";
+            + "That name has already been banned.</span>";
     
     /**
      * The String that is displayed when the admin attempts to ban an 
      * IP address that has already been placed on the blacklist. 
      */
     private static final String ALREADY_BANNED_IP = "<span style=\"color:red;\">"
-            + "That IP address has already been banned</span>";
+            + "That IP address has already been banned.</span>";
     
     /**
      * The String that is displayed when the admin attempts to remove 
      * a user/name from the blacklist that isn't on the blacklist.
      */
     private static final String NOT_BANNED_NU = "<span style=\"color:red;\">"
-            + "That user/name is not on the blacklist</span>";
+            + "That user/name is not on the blacklist.</span>";
     
     /**
      * The String that is displayed when the admin attempts to remove 
      * an IP address from the blacklist that isn't on the blacklist.
      */
     private static final String NOT_BANNED_IP = "<span style=\"color:red;\">"
-            + "That IP address is not on the blacklist</span>";
+            + "That IP address is not on the blacklist.</span>";
     
     /**
      * The String that is displayed when an invalid IP address is entered.
      */
-    private static final String INVALID_IP = "<span style=\"color;red;\">"
-            + "Invalid IP address</span>";
+    private static final String INVALID_IP = "<span style=\"color:red;\">"
+            + "Invalid IP address.</span>";
     
     /**
      * The String that is displayed when a username that doesn't match 
      * any player is used as an argument to a method.
      */
     private static final String UNKNOWN_PLAYER = "<span style=\"color:red;\">"
-            + "Unknown player: no player with that name is connected</span>";
+            + "Unknown player: no player with that name is connected.</span>";
     
     /**
      * A TreeMap that stores all method stubs.
@@ -457,7 +498,7 @@ public class ClientCommunication {
         COMMAND_TXT.put("w", "/w &lt;<i>player</i>> &lt;<i>message</i>...>");
         COMMAND_TXT.put("tell", "/tell &lt;<i>player</i>> &lt;<i>message</i>...>");
         COMMAND_TXT.put("msg", "/msg &lt;<i>player</i>> &lt;<i>message</i>...>");
-        COMMAND_TXT.put("banlist", "/banlist <ips|players>");
+        COMMAND_TXT.put("banlist", "/banlist &lt;ips|players>");
         COMMAND_TXT.put("pardon", "/pardon &lt;<i>player</i>>");
         COMMAND_TXT.put("pardon-ip", "/pardon-ip &lt;<i>address</i>>");
         COMMAND_TXT.put("stop", "/stop");
@@ -518,34 +559,45 @@ public class ClientCommunication {
                 if(data.length == 2) {
                     String player2 = data[1];
                     if(!HANDLERS.containsKey(player2)) {
-                        return (BANNED_NAMES.add(player2))
-                                ?"<span style=\"color:blue;\">Successfully added "
-                                + player2 +" to the name blacklist.</span>"
-                                :ALREADY_BANNED_N;
+                        if(BANNED_NAMES.containsKey(player2)) {
+                            return ALREADY_BANNED_N;
+                        } else {
+                            BANNED_NAMES.put(player2, null);
+                            return "<span style=\"color:blue;\">Successfully added "
+                                + player2 +" to the name blacklist.</span>";
+                        }
                     }
                     Handler toSend = HANDLERS.get(player2);
                     toSend.out.println("BAN");
-                    return (BANNED_NAMES.add(player2))
-                            ?"<span style=\"color:green;\">Successfully added "
-                            + player2 +" to the user blacklist.</span>"
-                            :ALREADY_BANNED_U;
+                    if(BANNED_NAMES.containsKey(player2)) {
+                        return ALREADY_BANNED_U;
+                    } else {
+                        return "<span style=\"color:green;\">Successfully added "
+                            + player2 +" to the user blacklist.</span>";
+                    }
                 } else if(data.length > 2) {
                     String player = data[1], reason = "";
                     if(!HANDLERS.containsKey(player)) {
-                        return (BANNED_NAMES.add(player))
-                                ?"<span style=\"color:blue;\">Successfully added "
-                                + player +" to the name blacklist.</span>"
-                                :ALREADY_BANNED_N;
+                        if(BANNED_NAMES.containsKey(player)) {
+                            return ALREADY_BANNED_N;
+                        } else {
+                            BANNED_NAMES.put(player, reason);
+                            return "<span style=\"color:blue;\">Successfully added "
+                                + player +" to the name blacklist.</span>";
+                        }
                     }
                     for(int i = 2; i < data.length; i++) {
                         reason += data[i] + " ";
                     }
                     Handler toSend = HANDLERS.get(player);
                     toSend.out.println("BAN" + reason);
-                    return (BANNED_NAMES.add(player))
-                            ?"<span style=\"color:green;\">Successfully added "
-                            + player +" to the user blacklist.</span>"
-                            :ALREADY_BANNED_U;
+                    if(BANNED_NAMES.containsKey(player)) {
+                        return ALREADY_BANNED_U;
+                    } else {
+                        BANNED_NAMES.put(player, reason);
+                        return "<span style=\"color:green;\">Successfully added "
+                            + player +" to the user blacklist.</span>";
+                    }
                 } else return BAD_METHOD_CALL_1;
             case "ban-ip":
                 if(data.length == 2) {
@@ -554,28 +606,41 @@ public class ClientCommunication {
                         Handler toBan = HANDLERS.get(thing2);
                         toBan.out.println("BAN");
                         InetAddress ia2 = toBan.socket.getInetAddress();
-                        return (BANNED_IPS.add(ia2))
-                                ?"<span style=\"color:green;\">Successfully added " 
-                                + ia2.getHostAddress() + " to the IP blacklist.</span>"
-                                :ALREADY_BANNED_IP;
+                        if(BANNED_IPS.containsKey(ia2)) {
+                            return ALREADY_BANNED_IP;
+                        } else {
+                            BANNED_IPS.put(ia2, null);
+                            return "<span style=\"color:green;\">Successfully added " 
+                                + ia2.getHostAddress() + " to the IP blacklist.</span>";
+                        }
                     } else {
                         try {
                             InetAddress ia = InetAddress.getByName(thing2);
                             String ip2 = ia.getHostAddress();
                             Handler toBan = null;
                             for(Handler h : HANDLERS.values()) {
-                                if(ip2.equals(h.socket.getInetAddress().getHostAddress())) {
+                                if(ia.equals(h.socket.getInetAddress())) {
+                                    toBan = h;
                                     break;
                                 }
                             }
                             if(toBan == null) {
-                                return UNKNOWN_PLAYER;
+                                if(BANNED_IPS.containsKey(ia)) {
+                                    return ALREADY_BANNED_IP;
+                                } else {
+                                    BANNED_IPS.put(ia, null);
+                                    return "<span style=\"color:blue;\">Successfully added " 
+                                        + ip2 + " to the IP blacklist.</span>";
+                                }
                             } else {
                                 toBan.out.println("BAN");
-                                return (BANNED_IPS.add(ia))
-                                        ?"<span style=\"color:green;\">Successfully added " 
-                                        + ia.getHostAddress() + " to the IP blacklist.</span>"
-                                        :ALREADY_BANNED_IP;
+                                if(BANNED_IPS.containsKey(ia)) {
+                                    return ALREADY_BANNED_IP;
+                                } else {
+                                    BANNED_IPS.put(ia, null);
+                                    return "<span style=\"color:green;\">Successfully added " 
+                                        + ip2 + " to the IP blacklist.</span>";
+                                }
                             }
                         } catch (UnknownHostException ex) {
                             return INVALID_IP;
@@ -590,10 +655,13 @@ public class ClientCommunication {
                         Handler toBan = HANDLERS.get(thing);
                         toBan.out.println("BAN" + reason);
                         InetAddress ia2 = toBan.socket.getInetAddress();
-                        return (BANNED_IPS.add(ia2))
-                                ?"<span style=\"color:green;\">Successfully added " 
-                                + ia2.getHostAddress() + " to the IP blacklist.</span>"
-                                :ALREADY_BANNED_IP;
+                        if(BANNED_IPS.containsKey(ia2)) {
+                            return ALREADY_BANNED_IP;
+                        } else {
+                            BANNED_IPS.put(ia2, reason);
+                            return "<span style=\"color:green;\">Successfully added " 
+                                + ia2.getHostAddress() + " to the IP blacklist.</span>";
+                        }
                     } else {
                         try {
                             InetAddress ia = InetAddress.getByName(thing);
@@ -605,13 +673,22 @@ public class ClientCommunication {
                                 }
                             }
                             if(toBan == null) {
-                                return UNKNOWN_PLAYER;
+                                if(BANNED_IPS.containsKey(ia)) {
+                                    return ALREADY_BANNED_IP;
+                                } else {
+                                    BANNED_IPS.put(ia, reason);
+                                    return "<span style=\"color:blue;\">Successfully added " 
+                                        + ia.getHostAddress() + " to the IP blacklist.</span>";
+                                }
                             } else {
                                 toBan.out.println("BAN" + reason);
-                                return (BANNED_IPS.add(ia))
-                                        ?"<span style=\"color:green;\">Successfully added " 
-                                        + ia.getHostAddress() + " to the IP blacklist.</span>"
-                                        :ALREADY_BANNED_IP;
+                                if(BANNED_IPS.containsKey(ia)) {
+                                    return ALREADY_BANNED_IP;
+                                } else {
+                                    BANNED_IPS.put(ia, reason);
+                                    return "<span style=\"color:green;\">Successfully added " 
+                                        + ia.getHostAddress() + " to the IP blacklist.</span>";
+                                }
                             }
                         } catch (UnknownHostException ex) {
                             return INVALID_IP;
@@ -623,13 +700,13 @@ public class ClientCommunication {
                     switch(data[1]) {
                         case "ips":
                             String outputIP = "<span style=\"color:green;\">IP blacklist:</span><br>";
-                            for(InetAddress inA : BANNED_IPS) {
+                            for(InetAddress inA : BANNED_IPS.keySet()) {
                                 outputIP += inA.getHostAddress() + "<br>";
                             }
                             return outputIP;
                         case "players":
                             String outputP = "<span style=\"color:green;\">Player blacklist:</span><br>";
-                            for(String s : BANNED_NAMES) {
+                            for(String s : BANNED_NAMES.keySet()) {
                                 outputP += s + "<br>";
                             }
                             return outputP;
@@ -656,29 +733,36 @@ public class ClientCommunication {
             case "pardon":
                 if(data.length == 2) {
                     String player = data[1];
-                    return (BANNED_NAMES.remove(player))
-                            ?"<span style=\"color:green;\">Successfully removed "
-                            + player + " from the name/player blacklist."
-                            :NOT_BANNED_NU;
+                    if(BANNED_NAMES.containsKey(player)) {
+                        BANNED_NAMES.remove(player);
+                        return "<span style=\"color:green;\">Successfully removed "
+                            + player + " from the name/player blacklist.</span>";
+                    } else return NOT_BANNED_NU;
                 } else return BAD_METHOD_CALL_1;
             case "pardon-ip":
                 if(data.length == 2) {
-                    String ip = data[1];
-                    InetAddress toRemove = null;
-                    for(InetAddress ia : BANNED_IPS) {
-                        String ip0 = ia.getHostAddress();
-                        if(ip0.equals(ip)) {
-                            // this is the one
-                            toRemove = ia;
+                    try {
+                        String ip = data[1];
+                        InetAddress current = InetAddress.getByName(ip);
+                        if (BANNED_IPS.containsKey(current)) {
+                            BANNED_IPS.remove(current);
+                            return "<span style=\"color:green;\">Successfully removed "
+                                    + current.getHostAddress() + " from the IP blacklist.</span>";
+                        } else {
+                            return NOT_BANNED_IP;
                         }
+                    } catch (UnknownHostException uhe) {
+                        return INVALID_IP;
                     }
-                    if(toRemove != null) {
-                        BANNED_IPS.remove(toRemove);
-                        return "<span style=\"color:green;\">Successfully removed " 
-                                + toRemove.getHostAddress() + " from the IP blacklist.";
-                    } else return NOT_BANNED_IP;
                 } else return BAD_METHOD_CALL_1;
             case "stop":
+                for(Handler h : HANDLERS.values()) {
+                    try {
+                        h.close();
+                    } catch (IOException ex) {
+                        serverUI.printStackTrace(ex);
+                    }
+                }
                 System.exit(0);
                 break;
             case "list":
@@ -694,9 +778,20 @@ public class ClientCommunication {
                     String num = data[1];
                     try {
                         int max = Integer.parseInt(num);
+                        int current = HANDLERS.size();
+                        if(max < current) 
+                            max = current;
+                        if(max < 1) 
+                            max = 1;
+                        
+                        max_players = max;
+                        
+                        return "<span style=\"color:green;\">Successfully set maximum number of players to "
+                                + max + ".</span>";
                     } catch (NumberFormatException nfe) {
                         if(num.equals("clear")) {
-                            
+                            max_players = -1;
+                            return "<span style=\"color:green;\">Successfully cleared room size limit.</span>";
                         } else return BAD_METHOD_CALL_3;
                     }
                 } else return BAD_METHOD_CALL_1;
@@ -706,9 +801,7 @@ public class ClientCommunication {
         try {
             throw new Exception("How did we get here?");
         } catch (Exception e) {
-            serverUI.chatOut.print("<span style=\"color:rgb(128,0,0);\">");
-            e.printStackTrace(serverUI.chatOut);
-            serverUI.chatOut.println("</span>");
+            serverUI.printStackTrace(e);
         }
         return null;
     }
@@ -773,7 +866,7 @@ public class ClientCommunication {
         int start = page*5-5, size = COMMAND_TXT.size();
         if(start >= size || start < 0)
             return "<span style=\"color:red;\">There is no page " + page + 
-                    "</span>";
+                    ".</span>";
         String output = "<span style = \"color:green;\">--- Showing help page " 
                 + page + " of " + ((int) Math.ceil(size/5.0)) + 
                 " (/help &lt;page>) ---</span><br>";
