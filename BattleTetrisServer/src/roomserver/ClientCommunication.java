@@ -147,6 +147,13 @@ public class ClientCommunication {
                     socket.getInputStream()));
                 out = new PrintWriter(socket.getOutputStream(), true);
                 
+                // Check if this server still has any room
+                if(max_players != -1 && HANDLERS.size() == max_players) {
+                    out.println("FULL");
+                    close();
+                    return;
+                }
+                
                 // Check if this IP is banned
                 InetAddress thisAdd = socket.getInetAddress();
                 if(BANNED_IPS.containsKey(thisAdd)) {
@@ -341,8 +348,10 @@ public class ClientCommunication {
          * @throws IOException if something goes wrong
          */
         private void close() throws IOException {
-            for(Handler h : HANDLERS.values()) {
-                h.out.println("REMOVECLIENT" + name);
+            if(name != null) {
+                for (Handler h : HANDLERS.values()) {
+                    h.out.println("REMOVECLIENT" + name);
+                }
             }
             if(opponent != null) {
                 opponent.out.println("EXIT");
@@ -351,7 +360,7 @@ public class ClientCommunication {
                     h.out.println("FREE" + opponent.name);
                 }
             }
-            if(HANDLERS != null) {
+            if(name != null && HANDLERS != null) {
                 HANDLERS.remove(name);
                 serverUI.removePlayer(name);
             }
@@ -778,16 +787,25 @@ public class ClientCommunication {
                     String num = data[1];
                     try {
                         int max = Integer.parseInt(num);
+                        String extra = "";
+                        
                         int current = HANDLERS.size();
-                        if(max < current) 
+                        if(max < current) {
                             max = current;
-                        if(max < 1) 
-                            max = 1;
+                            extra = "&lt;Restrained to current amount of players>";
+                        }
+                        if(max < 2) {
+                            max = 2;
+                            extra = "&lt;Restrained to the minimum allowed players>";
+                        }
                         
                         max_players = max;
                         
-                        return "<span style=\"color:green;\">Successfully set maximum number of players to "
-                                + max + ".</span>";
+                        return ("".equals(extra))
+                                ?"<span style=\"color:green;\">Successfully set maximum number of players to "
+                                + max + ".</span>"
+                                :"<span style=\"color:green;\">Successfully set maximum number of players to "
+                                + max + ".<br>" + extra + "</span>";
                     } catch (NumberFormatException nfe) {
                         if(num.equals("clear")) {
                             max_players = -1;

@@ -190,6 +190,7 @@ public class ServerUI extends JFrame {
         ServerUI output = new ServerUI();
         EventQueue.invokeLater(() -> {
             output.setVisible(true);
+            output.textField.requestFocus();
         });
         return output;
     }
