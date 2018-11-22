@@ -67,6 +67,7 @@ public class TetrisFrame extends JFrame {
                     JOptionPane.showMessageDialog(_this, "You lost.",
                             "Game Over", JOptionPane.INFORMATION_MESSAGE);
                 }
+                dispose();
             } else notifyListener(message);
         });
         
