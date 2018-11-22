@@ -2,10 +2,14 @@ package simpletetris;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URISyntaxException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javax.swing.SwingUtilities;
+import util.Resources;
 
 /**
  * A class that plays audio on command
@@ -105,9 +109,27 @@ public class AudioPlayer {
     static {
         FLOWER_GARDEN = new Media(
                 new File("music/flowergarden.m4a").toURI().toString());
+        /*
+        Media temp = null;
+        try {
+            temp = Resources.getMedia("music/flowergarden.m4a");
+        } catch (URISyntaxException ex) {
+            System.err.println("Flower garden m4a URI not right");
+        }
+        FLOWER_GARDEN = temp;
+        */
         
         ATHLETIC = new Media(
                 new File("music/athletic.m4a").toURI().toString());
+        /*
+        temp = null;
+        try {
+            temp = Resources.getMedia("music/athletic.m4a");
+        } catch (URISyntaxException ex) {
+            System.err.println("Athletic URI m4a not right");
+        }
+        ATHLETIC = temp;
+        */
         
         OVERWORLD = new Media(
                 new File("music/overworld.m4a").toURI().toString());

@@ -97,7 +97,7 @@ public class ServerCommunication {
      */
     private void run_() throws IOException {
         try {
-// Make connection and initialize streams
+            // Make connection and initialize streams
             String serverAddress;
             Socket socket = null;
             do {
