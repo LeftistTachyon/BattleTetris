@@ -1482,6 +1482,7 @@ public class TetrisMatrix {
                         Executors.newScheduledThreadPool(1).schedule(
                                 new LockDelayChecker(touches, pieceNo),
                                 500, TimeUnit.MILLISECONDS);
+                        return;
                     }
                     if (!falling.overlaps(miniMatrix(0, -1)) && !floating) {
                         floating = true;
