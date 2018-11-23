@@ -2,14 +2,10 @@ package simpletetris;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javax.swing.SwingUtilities;
-import util.Resources;
 
 /**
  * A class that plays audio on command

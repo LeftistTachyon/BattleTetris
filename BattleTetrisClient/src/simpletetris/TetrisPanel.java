@@ -215,7 +215,7 @@ public class TetrisPanel extends JPanel implements Runnable {
                 loseTransformY = 0;
                 playerMatrix.clearMatrix();
                 opponentMatrix.clearMatrix();
-                AudioPlayer.playInGameBackground();
+                // AudioPlayer.playInGameBackground();
                 centerImage = READY;
                 Thread.sleep(1000);
                 centerImage = GO;

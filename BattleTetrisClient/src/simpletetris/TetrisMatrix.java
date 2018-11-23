@@ -877,8 +877,6 @@ public class TetrisMatrix {
     public void newPiece() {
         falling = bag.remove();
         
-        System.out.println(bag.next(0) == null);
-        
         moveTetToStart();
         
         gravity.resetGravity();
