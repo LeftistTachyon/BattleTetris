@@ -1213,7 +1213,7 @@ public class TetrisMatrix {
         for(int i = 0; i < lines; i++) {
             if(Math.random() < 0.25) {
                 if(cnt != 0) {
-                    output += hole + " " + cnt + " ";
+                    output = hole + " " + cnt + " " + output;
                     cnt = 0;
                 }
                 hole = (int) (Math.random() * WIDTH);
@@ -1221,7 +1221,7 @@ public class TetrisMatrix {
             setGarbageLine(HEIGHT - i - 1, hole);
             cnt++;
         }
-        output += hole + " " + cnt + " ";
+        output = hole + " " + cnt + " " + output;
         return output.trim();
     }
     
