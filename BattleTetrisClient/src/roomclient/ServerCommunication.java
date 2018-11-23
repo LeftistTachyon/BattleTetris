@@ -376,7 +376,7 @@ public class ServerCommunication {
                 }
             }
         } catch (Exception e) {
-            lw.addLobbyMessage("ERROR: " + e.toString());
+            e.printStackTrace();
         }
     }
     
