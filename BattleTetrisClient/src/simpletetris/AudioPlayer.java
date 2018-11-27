@@ -158,6 +158,8 @@ public class AudioPlayer {
         WIN_MATCH = new Media(new File("sfx/winM.m4a").toURI().toString());
         
         MOVE = new Media(new File("sfx/move.wav").toURI().toString());
+        
+        initialize();
     }
     
     /**
@@ -296,7 +298,7 @@ public class AudioPlayer {
     /**
      * Initializes JavaFX.
      */
-    private static void initialize() {
+    public static void initialize() {
         try {
             SwingUtilities.invokeAndWait(JFXPanel::new);
         } catch (InterruptedException ex) {
