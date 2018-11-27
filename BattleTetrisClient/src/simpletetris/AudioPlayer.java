@@ -289,7 +289,6 @@ public class AudioPlayer {
     public static void playMoveSFX(double volume) {
         if(!initialized) initialize();
         
-        System.out.println(MOVE == null);
         sfxPlayer = new MediaPlayer(MOVE);
         sfxPlayer.setVolume(volume);
         sfxPlayer.play();
