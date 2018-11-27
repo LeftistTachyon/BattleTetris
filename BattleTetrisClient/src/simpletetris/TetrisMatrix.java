@@ -943,10 +943,20 @@ public class TetrisMatrix {
         
         // lock
         Color[][] copy = falling.getDrawBox();
-        for(int r= 0; r < copy.length; r++) {
+        for(int r = 0; r < copy.length; r++) {
             for(int c = 0; c < copy[r].length; c++) {
-                if(copy[r][c] != null && matrix[r + x][c + y] == null) {
-                    matrix[r + x][c + y] = copy[r][c];
+                if(copy[r][c] != null) {
+                    if(r + x < 0 || r + x >= matrix.length) {
+                        System.err.println("Out of bounds in X:\tPiece: " 
+                                + falling.getShape() + "\t@: " + (r+x));
+                    } else {
+                        if(c + y < 0 || c + y >= matrix[r+x].length) {
+                            System.err.println("Out of bounds in Y:\tPiece: " 
+                                + falling.getShape() + "\t@: " + (c+y));
+                        } else {
+                            matrix[r + x][c + y] = copy[r][c];
+                        }
+                    }
                 }
             }
         }
